@@ -114,7 +114,7 @@ def discover_model_classes(folder: Path, base_cls: type) -> list[type]:
     module_name = f"models.{folder.name}"
     try:
         pkg = importlib.import_module(module_name)
-    except Exception as exc:  # noqa: BLE001 — surface any import-time error to the group
+    except Exception as exc:  # surfaces any import-time error to the group
         raise SubmissionError(
             f"Could not import '{module_name}'. Your folder must be a valid "
             f"Python package (an __init__.py that imports without errors). "
@@ -187,7 +187,7 @@ def make_generic_fixture(model_type: str, seed: int = 42, n_samples: int = 120, 
 def instantiate(cls: type):
     try:
         return cls()
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         raise SubmissionError(
             f"{cls.__name__}() could not be instantiated with no arguments. "
             "Every constructor parameter needs a sensible default — the "
@@ -229,15 +229,15 @@ def try_fit_and_detect_type(cls: type, fixture_fn, seed: int = 42) -> dict[str, 
             t0 = time.perf_counter()
             ret = inst.fit(X, y)
             elapsed = time.perf_counter() - t0
-            return dict(
-                ok=True, instance=inst, ret=ret, X=X, y=y, X_test=X_test,
-                elapsed=elapsed, fixture_label=fixture_label,
-                accepted_y_none=(y is None),
-            )
-        except Exception as exc:  # noqa: BLE001
+            return {
+                "ok": True, "instance": inst, "ret": ret, "X": X, "y": y, "X_test": X_test,
+                "elapsed": elapsed, "fixture_label": fixture_label,
+                "accepted_y_none": (y is None),
+            }
+        except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
             last_exc = exc
             continue
-    return dict(ok=False, error=last_exc, attempts=[a[0] for a in attempts])
+    return {"ok": False, "error": last_exc, "attempts": [a[0] for a in attempts]}
 
 
 def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResult]) -> None:
@@ -284,7 +284,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
     try:
         pre_md = inst1.get_metadata()
         effective_type = pre_md.get("model_type") if isinstance(pre_md, dict) else None
-    except Exception:  # noqa: BLE001
+    except Exception:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
         effective_type = None
     if effective_type not in VALID_MODEL_TYPES:
         effective_type = None
@@ -309,7 +309,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
             shape_ok = pred.ndim == 1 and pred.shape[0] == X_test.shape[0]
             shape_msg = f"predict() must return a 1D array of shape ({X_test.shape[0]},); got shape {pred.shape}."
         results.append(CheckResult(f"{label}: predict() output shape", shape_ok, "" if shape_ok else shape_msg))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
         pred = None
         results.append(CheckResult(f"{label}: predict() output shape", False, f"predict() raised: {type(exc).__name__}: {exc}"))
 
@@ -333,7 +333,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
             proba_ok = proba is None
             proba_msg = f"Non-classifiers must return None from predict_proba(); got {type(proba)}."
         results.append(CheckResult(f"{label}: predict_proba() contract", proba_ok, "" if proba_ok else proba_msg))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
         results.append(CheckResult(f"{label}: predict_proba() contract", False, f"predict_proba() raised: {type(exc).__name__}: {exc}"))
 
     # --- determinism: independent instance, same fixture, same seed ---
@@ -351,7 +351,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
             "stochastic component (and, for PyTorch groups, torch.manual_seed(42) "
             "+ torch.use_deterministic_algorithms(True) at import time).",
         ))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
         results.append(CheckResult(f"{label}: determinism (two fit+predict cycles match)", False, f"Second fit/predict cycle raised: {type(exc).__name__}: {exc}"))
 
     # --- metadata (post-fit, exact keys) ---
@@ -386,7 +386,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
                 json_ok = False
                 json_msg = f"hyperparameters/feature_importance must be JSON-serialisable (no numpy types, no callables): {exc}"
             results.append(CheckResult(f"{label}: hyperparameters/feature_importance are JSON-safe", json_ok, json_msg))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
         results.append(CheckResult(f"{label}: get_metadata() exact keys", False, f"get_metadata() raised post-fit: {type(exc).__name__}: {exc}"))
 
     # --- optional get_visualization_data ---
@@ -395,7 +395,7 @@ def validate_class(cls: type, folder: Path, fixture_fn, results: list[CheckResul
             viz = inst1.get_visualization_data()
             viz_ok = viz is None or (json.dumps(viz) is not None)
             results.append(CheckResult(f"{label}: get_visualization_data() JSON-safe", viz_ok, "", fatal=False))
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001 — deliberately broad: reports any failure in third-party submission code as a result line instead of crashing the validator
             results.append(CheckResult(
                 f"{label}: get_visualization_data() JSON-safe", False,
                 f"get_visualization_data() raised or returned non-JSON-safe data: {type(exc).__name__}: {exc}",
@@ -462,7 +462,7 @@ def run_ruff(folder: Path, backend_dir: Path, results: list[CheckResult]) -> Non
     try:
         proc = subprocess.run(
             ["ruff", "check", str(folder)],
-            cwd=backend_dir, capture_output=True, text=True, timeout=60,
+            cwd=backend_dir, capture_output=True, text=True, timeout=60, check=False,
         )
     except FileNotFoundError:
         results.append(CheckResult("ruff lint", False, "ruff is not installed/on PATH — install it and rerun (`pip install ruff`).", fatal=False))
@@ -479,7 +479,8 @@ def run_pytest_coverage(folder: Path, backend_dir: Path, results: list[CheckResu
                 f"--cov={folder}", "--cov-report=term-missing",
                 f"--cov-fail-under={COVERAGE_THRESHOLD}", "-q",
             ],
-            cwd=backend_dir, capture_output=True, text=True, timeout=TRAINING_TIME_CEILING_SECONDS + 60,
+            cwd=backend_dir, capture_output=True, text=True,
+            timeout=TRAINING_TIME_CEILING_SECONDS + 60, check=False,
         )
     except FileNotFoundError:
         results.append(CheckResult(
