@@ -1,5 +1,6 @@
 """Reference tests. Same pattern applies to your model."""
 import unittest
+
 import numpy as np
 from model import LogisticRegressionModel
 

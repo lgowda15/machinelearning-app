@@ -2,8 +2,8 @@
 this folder exists so every group has a complete, passing example to
 pattern-match against. Do not copy it as your submission."""
 import time
+
 import numpy as np
-from typing import Dict, Optional
 from sklearn.linear_model import LogisticRegression
 
 from models.base_model import BaseModel
@@ -22,7 +22,7 @@ class LogisticRegressionModel(BaseModel):
         self.classes_ = None
         self._train_time = None
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "LogisticRegressionModel":
+    def fit(self, X: np.ndarray, y: np.ndarray | None = None) -> "LogisticRegressionModel":
         if y is None:
             raise ValueError(
                 "LogisticRegressionModel is supervised; y must not be None."
@@ -51,12 +51,12 @@ class LogisticRegressionModel(BaseModel):
             )
         return self._model.predict(X)
 
-    def predict_proba(self, X: np.ndarray) -> Optional[np.ndarray]:
+    def predict_proba(self, X: np.ndarray) -> np.ndarray | None:
         if not self.is_fitted:
             raise RuntimeError("Call fit() before predict_proba().")
         return self._model.predict_proba(X)
 
-    def get_metadata(self) -> Dict:
+    def get_metadata(self) -> dict:
         return {
             "model_name": "Logistic Regression",
             "model_type": "classifier",

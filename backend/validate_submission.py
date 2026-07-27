@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 validate_submission.py — interface-contract validator for the ML Integration
 Platform (course UM25MB653CA2, https://github.com/lgowda15/machinelearning-app).

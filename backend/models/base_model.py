@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+
 import numpy as np
 
 
@@ -16,7 +16,7 @@ class BaseModel(ABC):
         self.n_features = None
 
     @abstractmethod
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "BaseModel":
+    def fit(self, X: np.ndarray, y: np.ndarray | None = None) -> "BaseModel":
         """Train the model and return self.
 
         X: 2D float64 array (n_samples, n_features), already preprocessed
@@ -31,18 +31,18 @@ class BaseModel(ABC):
         ...
 
     @abstractmethod
-    def predict_proba(self, X: np.ndarray) -> Optional[np.ndarray]:
+    def predict_proba(self, X: np.ndarray) -> np.ndarray | None:
         """Classifiers: (n_samples, n_classes) probabilities summing to 1,
         columns ordered to match self.classes_. Other model types: None.
         """
         ...
 
     @abstractmethod
-    def get_metadata(self) -> Dict:
+    def get_metadata(self) -> dict:
         """Return the metadata dict specified in the coding standards."""
         ...
 
-    def get_visualization_data(self) -> Optional[Dict]:
+    def get_visualization_data(self) -> dict | None:
         """Optional: JSON-serialisable data for model-specific visuals.
 
         Override only if your model produces visuals the generic metrics
