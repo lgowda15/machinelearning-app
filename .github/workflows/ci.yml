@@ -28,6 +28,10 @@ jobs:
         run: ruff check backend/
 
       - name: Reject changes outside the submitter's own group folder
+        # Only enforced on fork PRs — that's how the 12 model groups submit.
+        # Integration-team PRs come from branches on this repo (not a fork)
+        # and legitimately touch shared files like this one.
+        if: github.event.pull_request.head.repo.fork
         run: |
           git fetch origin "${{ github.event.pull_request.base.ref }}" --depth=1
           OUTSIDE=$(git diff --name-only "origin/${{ github.event.pull_request.base.ref }}...HEAD" \
