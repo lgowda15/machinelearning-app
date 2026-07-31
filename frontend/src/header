@@ -1,0 +1,10 @@
+function Header() {
+  return (
+    <header className="header">
+      <h1>ML Integration Platform</h1>
+      <p>Train, Evaluate and Predict using Machine Learning Models</p>
+    </header>
+  );
+}
+
+export default Header;
