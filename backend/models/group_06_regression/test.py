@@ -5,10 +5,20 @@ Run with:
     python -m pytest test.py --cov=. --cov-report=term-missing
 """
 
+import os
+import sys
 import unittest
 
 import numpy as np
-from model import RegressionModel
+
+# Ensure this file's own directory is on sys.path, regardless of how
+# pytest's rootdir/package detection resolves things (the __init__.py
+# in this folder can otherwise cause pytest to treat this as part of a
+# package rooted one level up, breaking the bare "from model import"
+# below and silently collecting zero tests).
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from model import RegressionModel  # noqa: E402
 
 
 class TestRegressionModelMultivariate(unittest.TestCase):
@@ -52,7 +62,7 @@ class TestRegressionModelMultivariate(unittest.TestCase):
         for k in ["model_name", "model_type", "hyperparameters",
                   "training_time_seconds", "n_features", "feature_importance"]:
             self.assertIn(k, md)
-        self.assertEqual(md["model_type"], "regression")
+        self.assertEqual(md["model_type"], "regressor")
         self.assertEqual(md["n_features"], 4)
 
     def test_wrong_feature_count_raises(self):
