@@ -8,7 +8,6 @@ Run with:
 import unittest
 
 import numpy as np
-
 from model import RegressionModel
 
 
