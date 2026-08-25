@@ -167,7 +167,7 @@ class RegressionModel(BaseModel):
         # instance for debugging).
         return {
             "model_name": "RegressionModel",
-            "model_type": "regression",
+            "model_type": "regressor",
             "hyperparameters": self.hyperparams,
             "training_time_seconds": self._train_time,
             "n_features": self.n_features,
