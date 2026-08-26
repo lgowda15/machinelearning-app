@@ -13,6 +13,7 @@ clustering models:
 |---|---|---|
 | `dbscan.py` | `DBSCANModel` | `sklearn.cluster.DBSCAN` |
 | `hierarchical.py` | `HierarchicalClusteringModel` | `sklearn.cluster.AgglomerativeClustering` + `scipy.cluster.hierarchy.linkage` |
+| `model.py` | N/A | **Validator Bridge:** Imports and exposes both models to satisfy the automated `validate_submission.py` script requirement for multi-algorithm groups. |
 
 Both classes inherit from `models.base_model.BaseModel` and implement
 the standard `fit` / `predict` / `predict_proba` / `get_metadata`
