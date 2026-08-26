@@ -9,7 +9,6 @@ from sklearn.mixture import GaussianMixture
 
 class GMMModel(BaseModel):
     """Gaussian Mixture Model clusterer.
-
     Wraps sklearn GaussianMixture. Receives preprocessed float64 input
     from the backend (Section 4 of the coding standards). Unsupervised:
     y is ignored if supplied.

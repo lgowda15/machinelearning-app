@@ -7,7 +7,6 @@ from gmm import GMMModel
 from kmeans import KMeansModel
 from knn import KNNModel
 
-
 class TestKNNModel(unittest.TestCase):
     def setUp(self):
         rng = np.random.default_rng(42)

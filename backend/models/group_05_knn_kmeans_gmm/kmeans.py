@@ -9,6 +9,7 @@ from sklearn.cluster import KMeans
 
 class KMeansModel(BaseModel):
     """K-Means clusterer.
+    
     Wraps sklearn KMeans. Receives preprocessed float64 input from the
     backend (Section 4 of the coding standards). Unsupervised: y is
     ignored if supplied.

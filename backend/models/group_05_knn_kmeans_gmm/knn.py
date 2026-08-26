@@ -13,6 +13,7 @@ class KNNModel(BaseModel):
     input from the backend (Section 4 of the coding standards).
     """
 
+    
     def __init__(
         self,
         n_neighbors: int = 5,
