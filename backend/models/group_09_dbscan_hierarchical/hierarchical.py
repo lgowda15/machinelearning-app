@@ -41,7 +41,7 @@ class HierarchicalClusteringModel(BaseModel):
         n_clusters: int = 2,
         linkage_method: str = "ward",
         metric: str = "euclidean",
-        distance_threshold: float = None,
+        distance_threshold: float | None = None,
         **kwargs,
     ):
         hyperparams = {
@@ -74,7 +74,7 @@ class HierarchicalClusteringModel(BaseModel):
     @staticmethod
     def _validate_X(X):
         if not isinstance(X, np.ndarray):
-            raise ValueError("X must be a NumPy ndarray.")
+            raise TypeError("X must be a NumPy ndarray.")
         if X.ndim != 2:
             raise ValueError(f"X must be a 2D array, got shape {X.shape}.")
         if X.dtype != np.float64:
@@ -145,7 +145,7 @@ class HierarchicalClusteringModel(BaseModel):
 
     def predict_proba(self, X):
         """Hierarchical clustering is not a probabilistic model."""
-        return None
+        return 
 
     def get_metadata(self):
         return {

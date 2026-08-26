@@ -38,7 +38,7 @@ class DBSCANModel(BaseModel):
         metric: str = "euclidean",
         algorithm: str = "auto",
         leaf_size: int = 30,
-        n_jobs: int = None,
+        n_jobs: int | None = None,
         **kwargs,
     ):
         hyperparams = {
@@ -72,7 +72,7 @@ class DBSCANModel(BaseModel):
     @staticmethod
     def _validate_X(X):
         if not isinstance(X, np.ndarray):
-            raise ValueError("X must be a NumPy ndarray.")
+            raise TypeError("X must be a NumPy ndarray.")
         if X.ndim != 2:
             raise ValueError(f"X must be a 2D array, got shape {X.shape}.")
         if X.dtype != np.float64:
@@ -158,7 +158,7 @@ class DBSCANModel(BaseModel):
 
     def predict_proba(self, X):
         """DBSCAN is not a probabilistic model; no class probabilities exist."""
-        return None
+        return 
 
     def get_metadata(self):
         return {
