@@ -1,4 +1,61 @@
-"""PCA — implement YourModel(BaseModel) here.
+import time
+import numpy as np
+from typing import Dict, Optional
+from sklearn.decomposition import PCA
+from models.base_model import BaseModel
 
-See CODING_STANDARDS.md and the worked SVM example before starting.
-"""
+class PCAModel(BaseModel):
+    """Principal Component Analysis (PCA) dimensionality reducer."""
+
+    def __init__(self, n_components: int = 2, random_state: int = 42, **kwargs):
+        super().__init__(n_components=n_components, **kwargs)
+        self.random_state = random_state
+        self._model = PCA(
+            n_components=n_components, 
+            random_state=random_state
+        )
+        self.n_components_in_ = None
+        self._train_time = None
+
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "PCAModel":
+        if X.ndim != 2:
+            raise ValueError(f"X must be 2D, got shape {X.shape}.")
+        
+        t0 = time.perf_counter()
+        self._model.fit(X)
+        self._train_time = time.perf_counter() - t0
+        
+        self.is_fitted = True
+        self.n_features = X.shape[1]
+        self.n_components_in_ = self._model.n_components_
+        return self
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        if not self.is_fitted:
+            raise RuntimeError("Call fit() before predict().")
+        if X.shape[1] != self.n_features:
+            raise ValueError(f"Model trained on {self.n_features} features, got {X.shape[1]}.")
+        
+        return self._model.transform(X)
+
+    def predict_proba(self, X: np.ndarray) -> Optional[np.ndarray]:
+        if not self.is_fitted:
+            raise RuntimeError("Call fit() before predict_proba().")
+        return None
+
+    def get_metadata(self) -> Dict:
+        return {
+            "model_name": "PCA",
+            "model_type": "dimensionality_reducer",
+            "hyperparameters": self.hyperparams,
+            "training_time_seconds": self._train_time,
+            "n_features": self.n_features,
+            "feature_importance": None,
+        }
+
+    def get_visualization_data(self) -> Optional[Dict]:
+        if not self.is_fitted:
+            raise RuntimeError("Call fit() before get_visualization_data().")
+        return {
+            "explained_variance_ratio": self._model.explained_variance_ratio_.tolist()
+        }
