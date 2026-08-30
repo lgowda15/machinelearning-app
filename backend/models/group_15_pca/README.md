@@ -1,25 +1,22 @@
-# PCA
+# PCA Dimensionality Reduction (Group 15)
 
-## Model
-_One sentence describing what this model does._
+A fast, flexible unsupervised method for dimensionality reduction using Singular Value Decomposition, provided via scikit-learn.
 
 ## Usage
 ```python
-from models.group_15_pca.model import YourModel
-model = YourModel()
-model.fit(X_train, y_train)
-preds = model.predict(X_test)
-```
+from group_15_pca import PCAModel
 
-## Hyperparameters
-| Name | Default | Controls |
-|---|---|---|
-|  |  |  |
+model = PCAModel(n_components=2)
+model.fit(X_train)
+X_reduced = model.predict(X_test)
+variance = model.get_visualization_data() 
 
-## Running the tests
-```bash
-python -m pytest test.py --cov=. --cov-report=term-missing
-```
 
-## Design decisions
-_Why this algorithm, why these hyperparameters, and how behaviour changes if key choices are altered._
+
+
+Step 1: Make sure you are inside the backend folder
+cd "file location"
+
+
+Step 2: Run the test using the short module path (no long file path needed)
+python -m pytest models/group_15_pca/test.py --cov=models/group_15_pca --cov-report term-missing

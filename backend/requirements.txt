@@ -5,3 +5,8 @@ python-multipart==0.0.32
 numpy==2.2.2
 pandas==2.2.3
 scikit-learn==1.9.0
+# group_03_rnn (RNNModel, LSTMModel, GRUModel) needs torch. Pinned above
+# numpy==2.2.2's ABI floor -- torch==2.2.0 (group_03_rnn/requirements.txt)
+# predates NumPy 2 support and crashes on import in this shared venv.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.13.0+cpu

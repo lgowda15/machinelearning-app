@@ -35,13 +35,35 @@ def _make_data(rng, n_samples, n_features, model_type):
     return X, y
 
 
+_DEFAULT_N_FEATURES = 4
+
+
+def _expected_n_features(cls: type) -> int:
+    """Feature count to generate for this model's fixture data.
+
+    CODING_STANDARDS.md SS4: "Sequence and image models (Groups 3 and 7)
+    receive the same 2D (n_samples, n_features) input... Document the
+    column order you expect in your README so the backend supplies
+    features consistently." Such models accept only an exact, fixed
+    column count and raise on anything else -- a generic n_features=4
+    fixture is a false failure for them, not a contract violation. Where a
+    model class declares EXPECTED_N_FEATURES, honour it; every other model
+    gets the generic default unchanged.
+    """
+    value = getattr(cls, "EXPECTED_N_FEATURES", _DEFAULT_N_FEATURES)
+    if not isinstance(value, int) or value <= 0:
+        return _DEFAULT_N_FEATURES
+    return value
+
+
 @pytest.fixture(params=list(REGISTRY.items()), ids=list(REGISTRY.keys()))
 def reference(request):
     name, cls = request.param
     model_type = cls().get_metadata()["model_type"]
+    n_features = _expected_n_features(cls)
     rng = np.random.default_rng(42)
-    X_train, y_train = _make_data(rng, 100, 4, model_type)
-    X_test, _ = _make_data(rng, 20, 4, model_type)
+    X_train, y_train = _make_data(rng, 100, n_features, model_type)
+    X_test, _ = _make_data(rng, 20, n_features, model_type)
     return {
         "name": name,
         "cls": cls,

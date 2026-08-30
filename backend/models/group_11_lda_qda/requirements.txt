@@ -1,2 +1,5 @@
-numpy==1.26.4
+numpy==2.3.5
+pytest==8.4.2
+pytest-cov==6.2.1
+ruff==0.12.12
 scikit-learn==1.9.0

@@ -15,3 +15,5 @@ dist/
 .claude/
 CLAUDE.md
 BUILD_SESSIONS.md
+GROUP_REMEDIATION.md
+DECISIONS.md
