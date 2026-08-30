@@ -43,6 +43,13 @@ model_type -- same situation as group_15/PCA, so it takes over the
 RefKMeansModel's file is untouched in backend/tests/reference_models/
 and can still be imported directly by anything that wants the reference
 specifically -- it's just no longer in the live manifest.
+
+group_02_random_forest_xgboost ships two classifier algorithms in one
+folder -- RandomForestModel and XGBoostModel -- each registered under
+its own plain algorithm-name key ("random_forest", "xgboost"), same
+convention as group_01/group_03/group_11. Neither takes over a
+conformance-reference key; there is no reference random forest or
+XGBoost stand-in among the four reference models.
 """
 import logging
 
@@ -52,6 +59,8 @@ from models.group_01_decision_trees.cart import CARTModel
 from models.group_01_decision_trees.chaid import CHAIDModel
 from models.group_01_decision_trees.id3 import ID3Model
 from models.group_01_decision_trees.oblique_tree import ObliqueDecisionTreeModel
+from models.group_02_random_forest_xgboost.random_forest import RandomForestModel
+from models.group_02_random_forest_xgboost.xgboost_model import XGBoostModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
@@ -86,6 +95,8 @@ MODEL_MANIFEST: dict[str, type] = {
     "regression": RegressionModel,
     "knn": KNNModel,
     "gmm": GMMModel,
+    "random_forest": RandomForestModel,
+    "xgboost": XGBoostModel,
 }
 
 

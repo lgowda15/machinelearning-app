@@ -26,6 +26,8 @@ EXPECTED_TYPES = {
     "regression": "regressor",
     "knn": "classifier",
     "gmm": "clusterer",
+    "random_forest": "classifier",
+    "xgboost": "classifier",
 }
 
 
@@ -61,7 +63,7 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
-            "lda", "qda", "knn",
+            "lda", "qda", "knn", "random_forest", "xgboost",
         }
         assert set(incompatible) == {
             "kmeans", "linear_regression", "rnn", "lstm", "gru", "regression", "gmm",

@@ -159,16 +159,13 @@ class XGBoostModel(BaseModel):
         return probabilities
 
     def get_metadata(self) -> dict:
-        if not self.is_fitted:
-            raise RuntimeError("Call fit() before get_metadata().")
-
         return {
             "model_name": "XGBoost",
             "model_type": "classifier",
             "hyperparameters": self.hyperparams,
-            "training_time_seconds": float(self._train_time),
-            "n_features": int(self.n_features),
-            "feature_importance": {
+            "training_time_seconds": None if not self.is_fitted else float(self._train_time),
+            "n_features": None if not self.is_fitted else int(self.n_features),
+            "feature_importance": None if not self.is_fitted else {
                 f"feature_{i}": float(score)
                 for i, score in enumerate(self._model.feature_importances_)
             },
