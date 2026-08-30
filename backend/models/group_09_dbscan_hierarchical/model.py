@@ -1,4 +1,4 @@
-"""DBSCAN, Hierarchical Clustering — implement YourModel(BaseModel) here.
+from models.group_09_dbscan_hierarchical.dbscan import DBSCANModel
+from models.group_09_dbscan_hierarchical.hierarchical import HierarchicalClusteringModel
 
-See CODING_STANDARDS.md and the worked SVM example before starting.
-"""
+__all__ = ["DBSCANModel", "HierarchicalClusteringModel"]
