@@ -1,2 +1,2 @@
-numpy==1.26.4
-scikit-learn==1.9.0
+# No additional dependencies beyond the project-wide pins
+# (numpy, scikit-learn) already specified in CODING_STANDARDS.md Section 2.

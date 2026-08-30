@@ -1,2 +1,10 @@
-numpy==1.26.4
+# Runtime dependencies — required to import and run model.py.
+# Versions pinned exactly as resolved and tested in a clean Python 3.12
+# virtual environment (Section 2 of the Coding Standards fixes
+# scikit-learn at 1.9.0; numpy is scikit-learn's own resolved version).
+numpy==2.5.1
 scikit-learn==1.9.0
+
+# Test dependencies — required to run test.py (Section 12).
+pytest==9.1.1
+pytest-cov==7.1.0
