@@ -18,7 +18,7 @@ import numpy as np
 # below and silently collecting zero tests).
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from model import RegressionModel  # noqa: E402
+from model import RegressionModel
 
 
 class TestRegressionModelMultivariate(unittest.TestCase):
