@@ -16,6 +16,11 @@ EXPECTED_TYPES = {
     "rnn": "regressor",
     "lstm": "regressor",
     "gru": "regressor",
+    "cart": "classifier",
+    "chaid": "classifier",
+    "id3": "classifier",
+    "oblique_tree": "classifier",
+    "svm": "classifier",
 }
 
 
@@ -49,7 +54,9 @@ class TestCompatibility:
         compatible_keys = {m["key"] for m in body["compatible"]}
         incompatible = {m["key"]: m["reason"] for m in body["incompatible"]}
 
-        assert compatible_keys == {"logistic_regression", "pca"}
+        assert compatible_keys == {
+            "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
+        }
         assert set(incompatible) == {"kmeans", "linear_regression", "rnn", "lstm", "gru"}
         assert "classification" in incompatible["kmeans"]
 

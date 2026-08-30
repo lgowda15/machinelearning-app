@@ -1,28 +1,40 @@
 """Model registry -- explicit manifest, never directory scanning.
 
-Registers only the four conformance references: the classifier reference
-in backend/models/example_logistic_regression/, and the clusterer,
-regressor, and dimensionality_reducer references in
-backend/tests/reference_models/.
+Registers the conformance references (classifier, clusterer, regressor) plus
+the group submissions that have been explicitly instructed for registration
+(see CLAUDE.md "Current state" and GROUP_REMEDIATION.md). Group submissions
+under backend/models/group_*/ are never imported here until so instructed.
 
-Group submissions under backend/models/group_*/ are never imported here
-until explicitly instructed (see CLAUDE.md "Current state").
+group_03_rnn was the first group submission registered. It ships three
+regressor architectures -- RNNModel, LSTMModel, GRUModel -- rather than the
+single model.py entry point other groups use; all three are registered here
+as separate manifest entries.
 
-group_03_rnn (explicitly instructed) is the first group submission
-registered. It ships three regressor architectures -- RNNModel, LSTMModel,
-GRUModel -- rather than the single model.py entry point other groups use;
-all three are registered here as separate manifest entries.
+group_01_decision_trees ships four classifier algorithms (CART, CHAID, ID3,
+oblique) in one folder, each registered under its own plain algorithm-name
+key -- same convention as group_03's rnn/lstm/gru entries.
+
+group_15_pca supplies a real PCA implementation, so it takes over the "pca"
+key from RefPCAModel (the dimensionality_reducer conformance reference).
+RefPCAModel's file is untouched in backend/tests/reference_models/ and can
+still be imported directly by anything that wants the reference
+specifically -- it's just no longer in the live manifest.
 """
 import logging
 
 from models.base_model import BaseModel
 from models.example_logistic_regression.model import LogisticRegressionModel
+from models.group_01_decision_trees.cart import CARTModel
+from models.group_01_decision_trees.chaid import CHAIDModel
+from models.group_01_decision_trees.id3 import ID3Model
+from models.group_01_decision_trees.oblique_tree import ObliqueDecisionTreeModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
+from models.group_13_svm.model import SVMModel
+from models.group_15_pca.model import PCAModel
 from tests.reference_models.ref_kmeans import RefKMeansModel
 from tests.reference_models.ref_linear import RefLinearRegressionModel
-from tests.reference_models.ref_pca import RefPCAModel
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +43,15 @@ MODEL_MANIFEST: dict[str, type] = {
     "logistic_regression": LogisticRegressionModel,
     "kmeans": RefKMeansModel,
     "linear_regression": RefLinearRegressionModel,
-    "pca": RefPCAModel,
+    "pca": PCAModel,
     "rnn": RNNModel,
     "lstm": LSTMModel,
     "gru": GRUModel,
+    "cart": CARTModel,
+    "chaid": CHAIDModel,
+    "id3": ID3Model,
+    "oblique_tree": ObliqueDecisionTreeModel,
+    "svm": SVMModel,
 }
 
 
