@@ -44,6 +44,7 @@ import importlib
 import importlib.util
 import inspect
 import json
+import os
 import re
 import subprocess
 import sys
@@ -471,14 +472,37 @@ def run_ruff(folder: Path, backend_dir: Path, results: list[CheckResult]) -> Non
 
 
 def run_pytest_coverage(folder: Path, backend_dir: Path, results: list[CheckResult]) -> None:
+    # Section 12/13 mandates the submission's test file be named exactly
+    # `test.py` and run as `pytest test.py`. Pointing pytest at the folder
+    # instead relies on its default discovery (test_*.py / *_test.py), which
+    # never matches a bare `test.py` — that silently collects zero tests and
+    # reports 0% coverage no matter how good the group's tests actually are.
+    test_file = folder / "test.py"
+    if not test_file.is_file():
+        results.append(CheckResult(
+            f"pytest with >={COVERAGE_THRESHOLD}% coverage", False,
+            f"Expected {test_file} per Section 13 — no test.py found in the submission folder.",
+        ))
+        return
+    # Section 12's example imports the model bare (`from model import ...`),
+    # which only resolves with the submission folder itself as cwd (matching
+    # the documented `cd` + `python -m pytest test.py` workflow). Several
+    # existing submissions instead import fully-qualified
+    # (`from models.group_XX.model import ...`), which only resolves with
+    # backend/ on sys.path. Support both: run with cwd=folder (satisfies the
+    # bare-import convention via python -m's own cwd insertion) and add
+    # backend_dir to PYTHONPATH (satisfies the qualified-import convention),
+    # rather than silently favoring one style over the other.
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(backend_dir) + os.pathsep + env.get("PYTHONPATH", "")
     try:
         proc = subprocess.run(
             [
-                sys.executable, "-m", "pytest", str(folder),
-                f"--cov={folder}", "--cov-report=term-missing",
+                sys.executable, "-m", "pytest", "test.py",
+                "--cov=.", "--cov-report=term-missing",
                 f"--cov-fail-under={COVERAGE_THRESHOLD}", "-q",
             ],
-            cwd=backend_dir, capture_output=True, text=True,
+            cwd=folder, env=env, capture_output=True, text=True,
             timeout=TRAINING_TIME_CEILING_SECONDS + 60, check=False,
         )
     except FileNotFoundError:
