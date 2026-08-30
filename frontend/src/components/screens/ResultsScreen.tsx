@@ -1,13 +1,17 @@
 import { Fragment } from "react";
 import { ClusterScatterChart } from "../charts/ClusterScatterChart";
 import { ConfusionMatrixChart } from "../charts/ConfusionMatrixChart";
+import { DendrogramChart } from "../charts/DendrogramChart";
 import { FeatureImportanceChart } from "../charts/FeatureImportanceChart";
 import { PredictedVsActualChart } from "../charts/PredictedVsActualChart";
+import { ShapValuesChart } from "../charts/ShapValuesChart";
+import { TreeStructureChart } from "../charts/TreeStructureChart";
 import { VariancePlotChart } from "../charts/VariancePlotChart";
 import { MetricsList } from "../MetricsList";
 import { ScreenPanel, WORKSPACE_WIDTH } from "../ScreenPanel";
 import { typeBorderClass, typeTextClass } from "../../lib/modelType";
 import type { components } from "../../types/api";
+import type { LinkageMatrix, ShapValues, TreeStructurePayload } from "../../types/visualizationData";
 
 type TrainedModelResponse = components["schemas"]["TrainedModelResponse"];
 type TrainResponse = components["schemas"]["TrainResponse"];
@@ -76,11 +80,46 @@ function ResultPanel({ result }: { result: TrainedModelResponse }) {
       {result.visualization_data && (
         <div className="mt-4">
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted">Model-provided data</p>
-          <ModelVisualizationDump data={result.visualization_data} />
+          <ModelSpecificVisual result={result} data={result.visualization_data} />
         </div>
       )}
     </section>
   );
+}
+
+/** Dispatches `visualization_data` to the chart built for its specific
+ * shape (DATA_FLOW_GUIDE.md §5.3: "whatever JSON-safe structure they
+ * return is handed to a matching frontend chart component we build for
+ * that specific shape") -- group_01's `tree_structure`, group_02's
+ * `shap_values`, group_09's `linkage_matrix`. Anything else (group_15's
+ * `explained_variance_ratio`, or a future group) falls back to the raw
+ * key/value dump this screen already had. */
+function ModelSpecificVisual({
+  result,
+  data,
+}: {
+  result: TrainedModelResponse;
+  data: Record<string, unknown>;
+}) {
+  if ("tree_structure" in data) {
+    return <TreeStructureChart data={data.tree_structure as TreeStructurePayload} />;
+  }
+  if ("shap_values" in data) {
+    const metrics = result.metrics as Record<string, unknown>;
+    const featureNames = Array.from({ length: result.n_features }, (_, i) => `feature_${i}`);
+    const classLabels = (metrics.labels as string[] | undefined) ?? [];
+    return (
+      <ShapValuesChart
+        shapValues={data.shap_values as ShapValues}
+        featureNames={featureNames}
+        classLabels={classLabels}
+      />
+    );
+  }
+  if ("linkage_matrix" in data) {
+    return <DendrogramChart linkageMatrix={data.linkage_matrix as LinkageMatrix} />;
+  }
+  return <ModelVisualizationDump data={data} />;
 }
 
 // The chart already renders these keys visually -- kept out of the raw
