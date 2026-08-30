@@ -24,6 +24,8 @@ EXPECTED_TYPES = {
     "lda": "classifier",
     "qda": "classifier",
     "regression": "regressor",
+    "knn": "classifier",
+    "gmm": "clusterer",
 }
 
 
@@ -59,10 +61,10 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
-            "lda", "qda",
+            "lda", "qda", "knn",
         }
         assert set(incompatible) == {
-            "kmeans", "linear_regression", "rnn", "lstm", "gru", "regression",
+            "kmeans", "linear_regression", "rnn", "lstm", "gru", "regression", "gmm",
         }
         assert "classification" in incompatible["kmeans"]
 
@@ -80,7 +82,7 @@ class TestCompatibility:
         response = client.post("/api/models/compatible", json={"data_id": data_id})
         body = response.json()
         compatible_keys = {m["key"] for m in body["compatible"]}
-        assert compatible_keys == {"kmeans", "pca"}
+        assert compatible_keys == {"kmeans", "pca", "gmm"}
 
     def test_clusterer_on_labelled_data_is_incompatible_with_reason_not_an_error(self, client):
         data_id = _load_sample(client, "iris")

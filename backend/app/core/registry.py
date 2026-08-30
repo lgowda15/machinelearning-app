@@ -33,6 +33,16 @@ behaviour from RefLinearRegressionModel's plain OLS fit -- registered
 under its own "regression" key alongside "linear_regression" rather than
 taking that key over, the same way rnn/lstm/gru coexist with
 linear_regression as distinct regressor techniques.
+
+group_05_knn_kmeans_gmm ships three algorithms in one folder: KNNModel
+(new "knn" key, classifier), KMeansModel, and GMMModel (new "gmm" key,
+clusterer). KMeansModel is a real K-Means implementation of the same
+algorithm RefKMeansModel stands in for, under the same clusterer
+model_type -- same situation as group_15/PCA, so it takes over the
+"kmeans" key from RefKMeansModel rather than getting a separate one.
+RefKMeansModel's file is untouched in backend/tests/reference_models/
+and can still be imported directly by anything that wants the reference
+specifically -- it's just no longer in the live manifest.
 """
 import logging
 
@@ -45,12 +55,14 @@ from models.group_01_decision_trees.oblique_tree import ObliqueDecisionTreeModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
+from models.group_05_knn_kmeans_gmm.gmm import GMMModel
+from models.group_05_knn_kmeans_gmm.kmeans import KMeansModel
+from models.group_05_knn_kmeans_gmm.knn import KNNModel
 from models.group_06_regression.model import RegressionModel
 from models.group_11_lda_qda.lda import LDAModel
 from models.group_11_lda_qda.qda import QDAModel
 from models.group_13_svm.model import SVMModel
 from models.group_15_pca.model import PCAModel
-from tests.reference_models.ref_kmeans import RefKMeansModel
 from tests.reference_models.ref_linear import RefLinearRegressionModel
 
 logger = logging.getLogger(__name__)
@@ -58,7 +70,7 @@ logger = logging.getLogger(__name__)
 # One import, one manifest entry, per model.
 MODEL_MANIFEST: dict[str, type] = {
     "logistic_regression": LogisticRegressionModel,
-    "kmeans": RefKMeansModel,
+    "kmeans": KMeansModel,
     "linear_regression": RefLinearRegressionModel,
     "pca": PCAModel,
     "rnn": RNNModel,
@@ -72,6 +84,8 @@ MODEL_MANIFEST: dict[str, type] = {
     "lda": LDAModel,
     "qda": QDAModel,
     "regression": RegressionModel,
+    "knn": KNNModel,
+    "gmm": GMMModel,
 }
 
 
