@@ -50,6 +50,17 @@ its own plain algorithm-name key ("random_forest", "xgboost"), same
 convention as group_01/group_03/group_11. Neither takes over a
 conformance-reference key; there is no reference random forest or
 XGBoost stand-in among the four reference models.
+
+group_09_dbscan_hierarchical ships two clusterer algorithms in one
+folder -- DBSCANModel ("dbscan") and HierarchicalClusteringModel
+("hierarchical_clustering") -- same plain-algorithm-name convention as
+group_01/group_02/group_03/group_11. Neither takes over a
+conformance-reference key; RefKMeansModel's old "kmeans" slot already
+went to group_05, and there is no reference DBSCAN or hierarchical
+stand-in among the four reference models. Neither has a native
+predict() on unseen data -- see DECISIONS.md Session E for the accepted
+resolution (exact-match fast path, then a deterministic nearest-
+neighbor-style fallback).
 """
 import logging
 
@@ -68,6 +79,10 @@ from models.group_05_knn_kmeans_gmm.gmm import GMMModel
 from models.group_05_knn_kmeans_gmm.kmeans import KMeansModel
 from models.group_05_knn_kmeans_gmm.knn import KNNModel
 from models.group_06_regression.model import RegressionModel
+from models.group_09_dbscan_hierarchical.dbscan import DBSCANModel
+from models.group_09_dbscan_hierarchical.hierarchical import (
+    HierarchicalClusteringModel,
+)
 from models.group_11_lda_qda.lda import LDAModel
 from models.group_11_lda_qda.qda import QDAModel
 from models.group_13_svm.model import SVMModel
@@ -97,6 +112,8 @@ MODEL_MANIFEST: dict[str, type] = {
     "gmm": GMMModel,
     "random_forest": RandomForestModel,
     "xgboost": XGBoostModel,
+    "dbscan": DBSCANModel,
+    "hierarchical_clustering": HierarchicalClusteringModel,
 }
 
 
