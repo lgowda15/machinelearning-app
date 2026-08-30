@@ -23,6 +23,7 @@ EXPECTED_TYPES = {
     "svm": "classifier",
     "lda": "classifier",
     "qda": "classifier",
+    "regression": "regressor",
 }
 
 
@@ -60,7 +61,9 @@ class TestCompatibility:
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
             "lda", "qda",
         }
-        assert set(incompatible) == {"kmeans", "linear_regression", "rnn", "lstm", "gru"}
+        assert set(incompatible) == {
+            "kmeans", "linear_regression", "rnn", "lstm", "gru", "regression",
+        }
         assert "classification" in incompatible["kmeans"]
 
     def test_regression_data_only_regressor_and_reducer_compatible(self, client):
@@ -68,7 +71,9 @@ class TestCompatibility:
         response = client.post("/api/models/compatible", json={"data_id": data_id})
         body = response.json()
         compatible_keys = {m["key"] for m in body["compatible"]}
-        assert compatible_keys == {"linear_regression", "pca", "rnn", "lstm", "gru"}
+        assert compatible_keys == {
+            "linear_regression", "pca", "rnn", "lstm", "gru", "regression",
+        }
 
     def test_clustering_data_clusterer_and_reducer_compatible(self, client):
         data_id = _load_sample(client, "blobs")

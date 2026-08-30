@@ -25,6 +25,14 @@ each registered under its own plain algorithm-name key -- same convention
 as group_01 and group_03. Its folder also exposes analyze_suitability and
 compare_lda_qda helpers; those aren't part of the BaseModel contract and
 are not registered here.
+
+group_06_regression ships one RegressionModel that adapts its strategy to
+input shape (a stationarity-driven differencing heuristic for a single
+feature, polynomial expansion for two or more), materially different
+behaviour from RefLinearRegressionModel's plain OLS fit -- registered
+under its own "regression" key alongside "linear_regression" rather than
+taking that key over, the same way rnn/lstm/gru coexist with
+linear_regression as distinct regressor techniques.
 """
 import logging
 
@@ -37,6 +45,7 @@ from models.group_01_decision_trees.oblique_tree import ObliqueDecisionTreeModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
+from models.group_06_regression.model import RegressionModel
 from models.group_11_lda_qda.lda import LDAModel
 from models.group_11_lda_qda.qda import QDAModel
 from models.group_13_svm.model import SVMModel
@@ -62,6 +71,7 @@ MODEL_MANIFEST: dict[str, type] = {
     "svm": SVMModel,
     "lda": LDAModel,
     "qda": QDAModel,
+    "regression": RegressionModel,
 }
 
 
