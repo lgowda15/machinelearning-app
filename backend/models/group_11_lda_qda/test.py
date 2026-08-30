@@ -5,6 +5,8 @@ import time
 
 import numpy as np
 import pytest
+from sklearn.datasets import make_classification
+
 from models.base_model import BaseModel
 from models.group_11_lda_qda import (
     LDAModel,
@@ -12,7 +14,6 @@ from models.group_11_lda_qda import (
     analyze_suitability,
     compare_lda_qda,
 )
-from sklearn.datasets import make_classification
 
 MODEL_CLASSES = (LDAModel, QDAModel)
 METADATA_KEYS = {
@@ -277,9 +278,9 @@ def test_store_covariance_exposes_fitted_covariance(
     retain covariance matrices, not just accept the flag silently."""
     X, y, _ = binary_data
     model = model_class(store_covariance=True).fit(X, y)
-    covariance_attribute = (
-        "covariance_" if model_class is LDAModel else "covariance_"
-    )
+    # Both LDA's and QDA's sklearn estimators expose the fitted covariance
+    # under the same attribute name.
+    covariance_attribute = "covariance_"
     assert hasattr(model._model, covariance_attribute)
     stored = getattr(model._model, covariance_attribute)
     assert stored is not None

@@ -225,8 +225,10 @@ def _recommend_model(model_reports: dict[str, dict[str, Any]]) -> tuple[str, str
             winner = "LDA" if lda_score > qda_score else "QDA"
             return (
                 winner,
-                f"{winner} has the higher mean cross-validated {metric}: "
-                f"{max(lda_score, qda_score):.6f} versus "
-                f"{min(lda_score, qda_score):.6f}.",
+                (
+                    f"{winner} has the higher mean cross-validated {metric}: "
+                    f"{max(lda_score, qda_score):.6f} versus "
+                    f"{min(lda_score, qda_score):.6f}."
+                ),
             )
     return "LDA", "All ranking metrics are tied; LDA is preferred as the simpler model."

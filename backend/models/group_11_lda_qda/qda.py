@@ -4,9 +4,10 @@ import time
 from typing import Any
 
 import numpy as np
-from models.base_model import BaseModel
 from numpy.typing import NDArray
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+from models.base_model import BaseModel
 
 from ._validation import require_fitted, validate_training_data, validate_X
 
