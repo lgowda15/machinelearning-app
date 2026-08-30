@@ -70,8 +70,8 @@ ml-integration/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/            # DataUpload, EDA, ModelSelector,
-│   │   │                          #   TrainingPanel, Results, Comparison
-│   │   ├── hooks/                 # useModels, useTraining
+│   │   │                          #   TrainingPanel, Results, Predict, Comparison
+│   │   ├── hooks/                 # useModels, useTraining, usePrediction, useComparison
 │   │   ├── api/                   # typed API client
 │   │   ├── types/                 # shared TypeScript types
 │   │   └── App.tsx
@@ -136,6 +136,8 @@ All endpoints exchange JSON except file uploads (multipart). Errors use a single
 
 Training is synchronous: the client submits a train request and receives metrics in the response. The train/test split defaults to 80/20 and is user-adjustable. Metrics returned depend on `model_type` — accuracy/precision/recall/F1 and a confusion matrix for classifiers; silhouette, Davies–Bouldin and inertia for clusterers; MSE/RMSE/R²/MAE for regressors; explained-variance for dimensionality reduction.
 
+Each trained model's response also carries `plot_data`: backend-generic, per-sample data for the two result charts scalar metrics can't feed — predicted-vs-actual pairs for regressors, and 2D scatter points (PCA-projected when there are more than two features, for display only) paired with cluster labels for clusterers. It's `null` for classifiers and dimensionality reducers, whose charts (confusion matrix, explained variance) are already fully fed by `metrics`. This is computed the same way `metrics`' own generic branches are (`app/core/metrics.py`) and is kept separate from `visualization_data`, which stays model-owned (Section 5.3 of `DATA_FLOW_GUIDE.md`).
+
 The full request/response schemas live in the Pydantic models under `app/schemas/` and are the authoritative contract; the frontend's TypeScript types in `src/types/` mirror them.
 
 ---
@@ -148,15 +150,15 @@ Upload CSV
    → Model selection (all models listed; incompatible ones greyed out)
    → Train/test split control (default 80/20)
    → Train (synchronous; progress indicator)
-   → Results (metrics + confusion matrix / distribution / comparison bars)
+   → Results (metrics + the type-appropriate chart, one panel per trained model)
    → Choose next action:
-        • Predict on new data (upload → predictions)
-        • Compare models (side-by-side metrics table + bar chart)
+        • Predict on new data (upload → predictions, column mismatch named before any request is sent)
+        • Compare models (side-by-side metrics table + bar chart, gated on matching model_type)
 ```
 
-State is held in `useModels` and `useTraining` hooks. The API client in `src/api/` is typed against `src/types/`, so a backend contract change that isn't reflected in the types surfaces as a compile error rather than a runtime failure.
+State is held in `useModels`, `useTraining`, `usePrediction`, and `useComparison` hooks. The API client in `src/api/` is typed against `src/types/`, so a backend contract change that isn't reflected in the types surfaces as a compile error rather than a runtime failure.
 
-Three charts, per the agreed scope: a confusion matrix (classifiers), feature/target distributions (EDA), and a model-comparison bar chart (comparison view).
+The results view renders one chart per `model_type`, not one chart overall: a confusion matrix (classifiers), a cluster scatter (clusterers, fed by `plot_data`), predicted-vs-actual (regressors, fed by `plot_data`), and a variance plot (dimensionality reducers). A feature-importance bar chart renders wherever `feature_importance` is present, independent of type. Beyond these, EDA's distribution charts and the comparison view's grouped bar chart round out the set.
 
 ---
 

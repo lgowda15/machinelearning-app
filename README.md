@@ -12,7 +12,7 @@ interface.
 ## For model groups
 Read `CODING_STANDARDS.md`. Your work goes in your own
 `backend/models/group_<NN>_<name>/` folder. Fork this repo, implement your
-model, run `python backend/validate_submission.py backend/models/group_<NN>_<name>/`,
+model, run `python backend/validate_submission.py backend/models/group_<NN>_<name>/  # see backend/models/example_logistic_regression/ for a passing reference`,
 then open a pull request against `main`.
 
 ## For the integration team
