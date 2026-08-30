@@ -7,7 +7,11 @@ venv/
 htmlcov/
 node_modules/
 dist/
+*.tsbuildinfo
 .DS_Store
 *.pkl
 *.pt
 *.h5
+.claude/
+CLAUDE.md
+BUILD_SESSIONS.md
