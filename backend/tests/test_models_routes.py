@@ -21,6 +21,8 @@ EXPECTED_TYPES = {
     "id3": "classifier",
     "oblique_tree": "classifier",
     "svm": "classifier",
+    "lda": "classifier",
+    "qda": "classifier",
 }
 
 
@@ -56,6 +58,7 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
+            "lda", "qda",
         }
         assert set(incompatible) == {"kmeans", "linear_regression", "rnn", "lstm", "gru"}
         assert "classification" in incompatible["kmeans"]

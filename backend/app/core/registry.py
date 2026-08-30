@@ -19,6 +19,12 @@ key from RefPCAModel (the dimensionality_reducer conformance reference).
 RefPCAModel's file is untouched in backend/tests/reference_models/ and can
 still be imported directly by anything that wants the reference
 specifically -- it's just no longer in the live manifest.
+
+group_11_lda_qda ships two classifier algorithms (LDA, QDA) in one folder,
+each registered under its own plain algorithm-name key -- same convention
+as group_01 and group_03. Its folder also exposes analyze_suitability and
+compare_lda_qda helpers; those aren't part of the BaseModel contract and
+are not registered here.
 """
 import logging
 
@@ -31,6 +37,8 @@ from models.group_01_decision_trees.oblique_tree import ObliqueDecisionTreeModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
+from models.group_11_lda_qda.lda import LDAModel
+from models.group_11_lda_qda.qda import QDAModel
 from models.group_13_svm.model import SVMModel
 from models.group_15_pca.model import PCAModel
 from tests.reference_models.ref_kmeans import RefKMeansModel
@@ -52,6 +60,8 @@ MODEL_MANIFEST: dict[str, type] = {
     "id3": ID3Model,
     "oblique_tree": ObliqueDecisionTreeModel,
     "svm": SVMModel,
+    "lda": LDAModel,
+    "qda": QDAModel,
 }
 
 
