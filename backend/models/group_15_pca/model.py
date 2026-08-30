@@ -1,8 +1,10 @@
 import time
+
 import numpy as np
-from typing import Dict, Optional
 from sklearn.decomposition import PCA
+
 from models.base_model import BaseModel
+
 
 class PCAModel(BaseModel):
     """Principal Component Analysis (PCA) dimensionality reducer."""
@@ -17,7 +19,7 @@ class PCAModel(BaseModel):
         self.n_components_in_ = None
         self._train_time = None
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "PCAModel":
+    def fit(self, X: np.ndarray, y: np.ndarray | None = None) -> "PCAModel":
         if X.ndim != 2:
             raise ValueError(f"X must be 2D, got shape {X.shape}.")
         
@@ -38,12 +40,12 @@ class PCAModel(BaseModel):
         
         return self._model.transform(X)
 
-    def predict_proba(self, X: np.ndarray) -> Optional[np.ndarray]:
+    def predict_proba(self, X: np.ndarray) -> np.ndarray | None:
         if not self.is_fitted:
             raise RuntimeError("Call fit() before predict_proba().")
         return None
 
-    def get_metadata(self) -> Dict:
+    def get_metadata(self) -> dict:
         return {
             "model_name": "PCA",
             "model_type": "dimensionality_reducer",
@@ -53,7 +55,7 @@ class PCAModel(BaseModel):
             "feature_importance": None,
         }
 
-    def get_visualization_data(self) -> Optional[Dict]:
+    def get_visualization_data(self) -> dict | None:
         if not self.is_fitted:
             raise RuntimeError("Call fit() before get_visualization_data().")
         return {

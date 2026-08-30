@@ -1,6 +1,9 @@
 import unittest
+
 import numpy as np
+
 from models.group_15_pca.model import PCAModel
+
 
 class TestPCAModel(unittest.TestCase):
     def setUp(self):

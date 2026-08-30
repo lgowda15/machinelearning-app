@@ -1,1 +1,1 @@
-from .model import PCAModel
+from .model import PCAModel as PCAModel
