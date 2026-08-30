@@ -3,8 +3,9 @@
 import time
 
 import numpy as np
-from models.base_model import BaseModel
 from sklearn.neighbors import KNeighborsClassifier
+
+from models.base_model import BaseModel
 
 
 class KNNModel(BaseModel):

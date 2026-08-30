@@ -3,8 +3,9 @@
 import time
 
 import numpy as np
-from models.base_model import BaseModel
 from sklearn.cluster import KMeans
+
+from models.base_model import BaseModel
 
 
 class KMeansModel(BaseModel):

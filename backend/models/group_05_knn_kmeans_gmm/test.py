@@ -1,11 +1,12 @@
 """Unit tests for KNN, K-Means, GMM. Minimum 80% coverage."""
+
 import unittest
 
 import numpy as np
-
 from gmm import GMMModel
 from kmeans import KMeansModel
 from knn import KNNModel
+
 
 class TestKNNModel(unittest.TestCase):
     def setUp(self):
