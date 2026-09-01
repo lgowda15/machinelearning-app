@@ -30,9 +30,10 @@ group_06_regression ships one RegressionModel that adapts its strategy to
 input shape (a stationarity-driven differencing heuristic for a single
 feature, polynomial expansion for two or more), materially different
 behaviour from RefLinearRegressionModel's plain OLS fit -- registered
-under its own "regression" key alongside "linear_regression" rather than
-taking that key over, the same way rnn/lstm/gru coexist with
-linear_regression as distinct regressor techniques.
+under its own "regression" key rather than taking over an existing one,
+the same way rnn/lstm/gru are distinct regressor techniques from each
+other. RefLinearRegressionModel's old "linear_regression" key was later
+removed from the live manifest -- see the note below.
 
 group_05_knn_kmeans_gmm ships three algorithms in one folder: KNNModel
 (new "knn" key, classifier), KMeansModel, and GMMModel (new "gmm" key,
@@ -61,6 +62,21 @@ stand-in among the four reference models. Neither has a native
 predict() on unseen data -- see DECISIONS.md Session E for the accepted
 resolution (exact-match fast path, then a deterministic nearest-
 neighbor-style fallback).
+
+group_07_cnn ships one CNNModel (new "cnn" key, classifier) -- a small
+two-conv-layer network for flattened 28x28-grayscale-image input
+(EXPECTED_N_FEATURES = 784, per CODING_STANDARDS.md SS4's note on
+sequence/image groups). No existing reference to take over; no reference
+CNN stand-in exists among the four reference models.
+
+RefLinearRegressionModel's "linear_regression" key was removed from the
+live manifest at the user's explicit instruction, once group_06's
+"regression" key gave the regressor model_type real, actively-registered
+coverage of its own -- see DECISIONS.md for the full record. Its file is
+untouched in backend/tests/reference_models/ and can still be imported
+directly by anything that wants the reference specifically (e.g. the
+conformance suite's four-reference baseline check); it's just no longer
+in MODEL_MANIFEST, same as RefPCAModel and RefKMeansModel above.
 """
 import logging
 
@@ -79,6 +95,7 @@ from models.group_05_knn_kmeans_gmm.gmm import GMMModel
 from models.group_05_knn_kmeans_gmm.kmeans import KMeansModel
 from models.group_05_knn_kmeans_gmm.knn import KNNModel
 from models.group_06_regression.model import RegressionModel
+from models.group_07_cnn.model import CNNModel
 from models.group_09_dbscan_hierarchical.dbscan import DBSCANModel
 from models.group_09_dbscan_hierarchical.hierarchical import (
     HierarchicalClusteringModel,
@@ -87,7 +104,6 @@ from models.group_11_lda_qda.lda import LDAModel
 from models.group_11_lda_qda.qda import QDAModel
 from models.group_13_svm.model import SVMModel
 from models.group_15_pca.model import PCAModel
-from tests.reference_models.ref_linear import RefLinearRegressionModel
 
 logger = logging.getLogger(__name__)
 
@@ -95,7 +111,6 @@ logger = logging.getLogger(__name__)
 MODEL_MANIFEST: dict[str, type] = {
     "logistic_regression": LogisticRegressionModel,
     "kmeans": KMeansModel,
-    "linear_regression": RefLinearRegressionModel,
     "pca": PCAModel,
     "rnn": RNNModel,
     "lstm": LSTMModel,
@@ -114,6 +129,7 @@ MODEL_MANIFEST: dict[str, type] = {
     "xgboost": XGBoostModel,
     "dbscan": DBSCANModel,
     "hierarchical_clustering": HierarchicalClusteringModel,
+    "cnn": CNNModel,
 }
 
 

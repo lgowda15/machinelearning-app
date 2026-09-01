@@ -11,7 +11,6 @@ from app.core import storage
 EXPECTED_TYPES = {
     "logistic_regression": "classifier",
     "kmeans": "clusterer",
-    "linear_regression": "regressor",
     "pca": "dimensionality_reducer",
     "rnn": "regressor",
     "lstm": "regressor",
@@ -30,6 +29,7 @@ EXPECTED_TYPES = {
     "xgboost": "classifier",
     "dbscan": "clusterer",
     "hierarchical_clustering": "clusterer",
+    "cnn": "classifier",
 }
 
 
@@ -65,10 +65,10 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
-            "lda", "qda", "knn", "random_forest", "xgboost",
+            "lda", "qda", "knn", "random_forest", "xgboost", "cnn",
         }
         assert set(incompatible) == {
-            "kmeans", "linear_regression", "rnn", "lstm", "gru", "regression", "gmm",
+            "kmeans", "rnn", "lstm", "gru", "regression", "gmm",
             "dbscan", "hierarchical_clustering",
         }
         assert "classification" in incompatible["kmeans"]
@@ -79,7 +79,7 @@ class TestCompatibility:
         body = response.json()
         compatible_keys = {m["key"] for m in body["compatible"]}
         assert compatible_keys == {
-            "linear_regression", "pca", "rnn", "lstm", "gru", "regression",
+            "pca", "rnn", "lstm", "gru", "regression",
         }
 
     def test_clustering_data_clusterer_and_reducer_compatible(self, client):

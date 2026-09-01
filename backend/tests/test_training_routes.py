@@ -83,9 +83,9 @@ class TestTrainClusterer:
 
 
 class TestTrainRegressor:
-    def test_linear_regression_on_diabetes_returns_regressor_metrics(self, client):
+    def test_regression_on_diabetes_returns_regressor_metrics(self, client):
         data_id = _load_sample(client, "diabetes")
-        response = _train(client, data_id, "linear_regression")
+        response = _train(client, data_id, "regression")
         assert response.status_code == 200
         result = response.json()["results"][0]
         assert result["model_type"] == "regressor"
