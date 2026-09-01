@@ -1,14 +1,12 @@
 """Convolutional Neural Network model for the ML Integration Platform."""
 
 import time
-from typing import Dict, Optional
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
 
 from models.base_model import BaseModel
-
 
 # Required for deterministic behaviour.
 torch.manual_seed(42)
@@ -66,9 +64,9 @@ class CNNModel(BaseModel):
         self.learning_rate = learning_rate
         self.random_state = random_state
 
-        self._model: Optional[_CNNNetwork] = None
-        self.classes_: Optional[np.ndarray] = None
-        self._train_time: Optional[float] = None
+        self._model: _CNNNetwork | None = None
+        self.classes_: np.ndarray | None = None
+        self._train_time: float | None = None
 
     def _validate_X(self, X: np.ndarray) -> None:
         """Validate the common input contract."""
@@ -108,7 +106,7 @@ class CNNModel(BaseModel):
     def fit(
         self,
         X: np.ndarray,
-        y: Optional[np.ndarray] = None,
+        y: np.ndarray | None = None,
     ) -> "CNNModel":
         """Train the CNN and return this model."""
         self._validate_X(X)
@@ -201,7 +199,7 @@ class CNNModel(BaseModel):
 
         return self.classes_[indices]
 
-    def predict_proba(self, X: np.ndarray) -> Optional[np.ndarray]:
+    def predict_proba(self, X: np.ndarray) -> np.ndarray | None:
         """Predict class probabilities."""
         if not self.is_fitted:
             raise RuntimeError("Call fit() before predict_proba().")
@@ -221,7 +219,7 @@ class CNNModel(BaseModel):
 
         return probabilities.cpu().numpy()
 
-    def get_metadata(self) -> Dict:
+    def get_metadata(self) -> dict:
         """Return the platform-required metadata."""
         return {
             "model_name": "Convolutional Neural Network",

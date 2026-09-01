@@ -1,5 +1,4 @@
 """Unit tests for Convolutional Neural Network. Minimum 80% coverage."""
-"""Unit tests for Convolutional Neural Network. Minimum 80% coverage."""
 
 import numpy as np
 import pytest
