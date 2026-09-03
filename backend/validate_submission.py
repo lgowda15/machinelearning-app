@@ -472,16 +472,37 @@ def run_ruff(folder: Path, backend_dir: Path, results: list[CheckResult]) -> Non
 
 
 def run_pytest_coverage(folder: Path, backend_dir: Path, results: list[CheckResult]) -> None:
-    # Section 12/13 mandates the submission's test file be named exactly
-    # `test.py` and run as `pytest test.py`. Pointing pytest at the folder
-    # instead relies on its default discovery (test_*.py / *_test.py), which
-    # never matches a bare `test.py` — that silently collects zero tests and
-    # reports 0% coverage no matter how good the group's tests actually are.
+    # Section 12/13's worked example names the submission's test file
+    # exactly `test.py` and runs it as `pytest test.py`. Pointing pytest at
+    # the folder instead relies on its default discovery (test_*.py /
+    # *_test.py), which never matches a bare `test.py` — that silently
+    # collects zero tests and reports 0% coverage no matter how good the
+    # group's tests actually are, so a single explicit filename is passed
+    # rather than a bare directory.
+    #
+    # Section 6 documents a second, equally valid layout for groups with
+    # more than one algorithm: one test file per class (test_knn.py,
+    # test_kmeans.py, ...; see group_03_rnn's test_rnn.py/test_lstm.py/
+    # test_gru.py, already merged). Check for that layout *first*: a
+    # scaffold's original empty `test.py` (just a docstring, never
+    # deleted) can be left sitting next to the real test_*.py files a
+    # multi-algorithm group added — group_03_rnn is exactly this case —
+    # and a bare `test.py` found first would silently run that empty
+    # stub instead of the real tests, passing zero-coverage as a pass.
+    # Falling back to bare `test.py` only when no test_*.py files exist
+    # keeps the single-algorithm layout (Section 12's worked example)
+    # working unchanged.
     test_file = folder / "test.py"
-    if not test_file.is_file():
+    multi_files = sorted(p.name for p in folder.glob("test_*.py"))
+    if multi_files:
+        pytest_args = multi_files
+    elif test_file.is_file():
+        pytest_args = ["test.py"]
+    else:
         results.append(CheckResult(
             f"pytest with >={COVERAGE_THRESHOLD}% coverage", False,
-            f"Expected {test_file} per Section 13 — no test.py found in the submission folder.",
+            f"Expected {test_file}, or at least one test_*.py file "
+            "(Section 6's multi-algorithm layout), in the submission folder.",
         ))
         return
     # Section 12's example imports the model bare (`from model import ...`),
@@ -498,7 +519,7 @@ def run_pytest_coverage(folder: Path, backend_dir: Path, results: list[CheckResu
     try:
         proc = subprocess.run(
             [
-                sys.executable, "-m", "pytest", "test.py",
+                sys.executable, "-m", "pytest", *pytest_args,
                 "--cov=.", "--cov-report=term-missing",
                 f"--cov-fail-under={COVERAGE_THRESHOLD}", "-q",
             ],
