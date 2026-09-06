@@ -5,19 +5,46 @@ interface ScreenPanelProps {
   maxWidthClassName?: string;
 }
 
-/** The data-dense screens' shared width (EDA, Model selection, Results,
- * Compare -- frontend.md's Layout section). One constant so the four
- * screens can't drift from each other. */
-export const WORKSPACE_WIDTH = "max-w-[1200px]";
+/**
+ * Shared width for data-dense screens such as:
+ * EDA, Model Selection, Results and Compare.
+ */
+export const WORKSPACE_WIDTH = "max-w-[1400px]";
 
-/** Every screen's outer card. Default width is the "focused, single-decision
- * screen" size (frontend.md's Layout section, max 720px) -- Start, Training
- * and Predict use it as-is; the data-dense screens (EDA, Model selection,
- * Results, Compare) pass the wider workspace width explicitly, and Upload
- * passes its own narrower 640px per its screen contract. */
-export function ScreenPanel({ children, maxWidthClassName = "max-w-[720px]" }: ScreenPanelProps) {
+/**
+ * Shared outer card used by all screens.
+ *
+ * Default:
+ * - Focused screens: 900px
+ *
+ * Wide:
+ * - EDA
+ * - Model Selection
+ * - Results
+ * - Compare
+ *
+ * Individual screens can still override the width when necessary.
+ */
+export function ScreenPanel({
+  children,
+  maxWidthClassName = "max-w-[900px]",
+}: ScreenPanelProps) {
   return (
-    <section className={`mx-auto ${maxWidthClassName} rounded-panel border border-rule bg-surface p-6 text-ink`}>
+    <section
+      className={`
+        mx-auto
+        w-full
+        ${maxWidthClassName}
+        rounded-panel
+        border
+        border-rule
+        bg-surface
+        px-8
+        py-7
+        text-ink
+        shadow-sm
+      `}
+    >
       {children}
     </section>
   );
