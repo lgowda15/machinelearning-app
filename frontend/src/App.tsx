@@ -19,16 +19,16 @@ const DEFAULT_TEST_SIZE = 0.2;
 function NoDatasetNotice() {
   return (
     <ScreenPanel>
-      <p className="text-sm text-muted">Upload a dataset or load a sample first.</p>
+      <p className="text-sm text-muted">
+        Upload a dataset or load a sample first.
+      </p>
     </ScreenPanel>
   );
 }
 
 function App() {
   const [view, setView] = useState<View>("start");
-  // The furthest step ever reached -- what makes a step "completed" and
-  // therefore clickable in the header's step indicator (frontend.md's
-  // Navigation section), independent of which step is currently shown.
+
   const [maxStepIndexReached, setMaxStepIndexReached] = useState(-1);
 
   const [profile, setProfile] = useState<DataProfileResponse | null>(null);
@@ -37,10 +37,12 @@ function App() {
 
   const modelsState = useModels();
   const trainingState = useTraining();
+
   const { checkCompatibility } = modelsState;
   const { reset: resetTraining } = trainingState;
 
-  const currentStepIndex = view === "start" ? -1 : STEPS.findIndex((s) => s.id === view);
+  const currentStepIndex =
+    view === "start" ? -1 : STEPS.findIndex((s) => s.id === view);
 
   const goToStepIndex = useCallback((index: number) => {
     setView(STEPS[index].id);
@@ -49,18 +51,12 @@ function App() {
 
   const handleProfile = useCallback((next: DataProfileResponse) => {
     setProfile(next);
-    // A new dataset invalidates every step past Upload -- model selection,
-    // training, results, prediction and comparison all depended on the
-    // dataset that just changed, so none of them count as "completed"
-    // anymore. This only ever fires while view is "upload" (only the
-    // Upload screen calls onProfile), so clamping to that step is safe.
     setMaxStepIndexReached(0);
   }, []);
 
-  // A new dataset invalidates any selection and training run made against
-  // the previous one, and needs its own compatibility check.
   useEffect(() => {
     if (!profile) return;
+
     setSelectedModelKeys([]);
     resetTraining();
     checkCompatibility(profile.data_id);
@@ -69,13 +65,19 @@ function App() {
   const toggleModel = useCallback(
     (key: string) => {
       setSelectedModelKeys((prev) =>
-        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+        prev.includes(key)
+          ? prev.filter((k) => k !== key)
+          : [...prev, key],
       );
-      // The prior run no longer matches the selection it would be shown
-      // against, and training/results/predict/compare are no longer
-      // "completed" for this selection.
+
       resetTraining();
-      setMaxStepIndexReached((m) => Math.min(m, STEPS.findIndex((s) => s.id === "model-selection")));
+
+      setMaxStepIndexReached((m) =>
+        Math.min(
+          m,
+          STEPS.findIndex((s) => s.id === "model-selection"),
+        ),
+      );
     },
     [resetTraining],
   );
@@ -88,10 +90,39 @@ function App() {
   };
 
   const currentStep = view === "start" ? null : (view as StepId);
-  const currentComplete = currentStep ? (isStepComplete[currentStep] ?? true) : false;
-  const canGoBack = currentStepIndex > 0;
-  const canGoForward = currentStepIndex >= 0 && currentStepIndex < STEPS.length - 1 && currentComplete;
 
+  const currentComplete = currentStep
+    ? (isStepComplete[currentStep] ?? true)
+    : false;
+
+  const canGoBack = currentStepIndex > 0;
+
+  const canGoForward =
+    currentStepIndex >= 0 &&
+    currentStepIndex < STEPS.length - 1 &&
+    currentComplete;
+
+  /*
+   * START SCREEN
+   *
+   * Render it outside StepShell completely.
+   * This guarantees there is NO top bar or bottom navigation.
+   */
+  if (view === "start") {
+    return (
+      <StartScreen
+        onBegin={() => {
+          goToStepIndex(0);
+        }}
+      />
+    );
+  }
+
+  /*
+   * WORKFLOW
+   *
+   * StepShell is only rendered after Begin is clicked.
+   */
   return (
     <StepShell
       view={view}
@@ -99,9 +130,20 @@ function App() {
       onNavigateToStep={goToStepIndex}
       canGoBack={canGoBack}
       canGoForward={canGoForward}
-      onBack={() => setView(STEPS[Math.max(0, currentStepIndex - 1)].id)}
-      onForward={() => goToStepIndex(Math.min(STEPS.length - 1, currentStepIndex + 1))}
-      renderStart={() => <StartScreen onBegin={() => goToStepIndex(0)} />}
+      onBack={() =>
+        setView(
+          STEPS[Math.max(0, currentStepIndex - 1)].id,
+        )
+      }
+      onForward={() =>
+        goToStepIndex(
+          Math.min(
+            STEPS.length - 1,
+            currentStepIndex + 1,
+          ),
+        )
+      }
+      renderStart={() => null}
       renderStep={(step) => {
         switch (step) {
           case "upload":
@@ -113,8 +155,14 @@ function App() {
                 onTestSizeChange={setTestSize}
               />
             );
+
           case "eda":
-            return profile ? <EdaScreen profile={profile} /> : <NoDatasetNotice />;
+            return profile ? (
+              <EdaScreen profile={profile} />
+            ) : (
+              <NoDatasetNotice />
+            );
+
           case "model-selection":
             return profile ? (
               <ModelSelectionScreen
@@ -128,6 +176,7 @@ function App() {
             ) : (
               <NoDatasetNotice />
             );
+
           case "training":
             return profile ? (
               <TrainingScreen
@@ -141,24 +190,35 @@ function App() {
             ) : (
               <NoDatasetNotice />
             );
+
           case "results":
             return profile ? (
               <ResultsScreen results={trainingState.results} />
             ) : (
               <NoDatasetNotice />
             );
+
           case "predict":
             return profile ? (
-              <PredictScreen profile={profile} trainingResults={trainingState.results} />
+              <PredictScreen
+                profile={profile}
+                trainingResults={trainingState.results}
+              />
             ) : (
               <NoDatasetNotice />
             );
+
           case "compare":
             return profile ? (
-              <CompareScreen trainingResults={trainingState.results} />
+              <CompareScreen
+                trainingResults={trainingState.results}
+              />
             ) : (
               <NoDatasetNotice />
             );
+
+          default:
+            return <NoDatasetNotice />;
         }
       }}
     />

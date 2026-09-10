@@ -1,18 +1,16 @@
 @import "tailwindcss";
+
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
+
 @import "@fontsource/jetbrains-mono/400.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
 /*
- * Design tokens — .claude/rules/frontend.md.
- * This is an instrument panel, not a marketing page: density and legibility,
- * colour spent on --signal plus the four model-type accents below, numbers
- * always in mono. Derived from the PES University mark (navy + compass
- * gold) — a light --ground, not a dark one; see frontend.md's "Visual
- * direction" for why a dark page background was rejected.
+ * Design tokens
  */
+
 @theme {
   --color-ground: #f5f6f8;
   --color-surface: #ffffff;
@@ -24,9 +22,7 @@
   --color-brand-navy: #16234f;
   --color-brand-gold: #d98a24;
 
-  /* Model-type colour coding (frontend.md) -- classifier reuses --signal
-   * itself rather than a fifth value, since the two are defined as the same
-   * hex; the other three each get their own token. */
+  /* Model-type colours */
   --color-type-cluster: #1e9e6b;
   --color-type-regress: #d98a24;
   --color-type-reduce: #7a4fd1;
@@ -34,14 +30,36 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  --radius-panel: 4px;
+  --radius-panel: 6px;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
+    margin: 0;
     background-color: var(--color-ground);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
   }
 
   :focus-visible {
