@@ -117,11 +117,20 @@ policy in `GROUP_REMEDIATION.md`.
 ## Resolution
 
 Real changes (#51, #53, #54, #55) combined into one consolidated branch and
-merged as a single PR from the integration account (no push access to the
-contributor's fork, same constraint as every prior group). #49 and #56
-closed without merging. Registered as `"ann"` in
-`backend/app/core/registry.py`. Conformance suite run scoped to this group,
-confirmed passing, before considering this group done.
+merged as PR #58 from the integration account (no push access to the
+contributor's fork, same constraint as every prior group) -- CI green,
+merged 2026-09-16. #49 and #56 closed without merging; #51/#53/#54/#55
+closed as superseded by #58.
+
+Registered as `"ann"` in `backend/app/core/registry.py`
+(`ANNModel`, classifier -- see the design note above on its dynamic
+model_type). Also required adding `"ann": "classifier"` to two hardcoded
+expectation sets in `backend/tests/test_models_routes.py`
+(`EXPECTED_TYPES` and the iris classification-compatible-keys set), same
+pattern as every other new-key registration in `GROUP_REMEDIATION.md`.
+
+Conformance suite scoped to `ann` only: 6/6 passed. Full backend suite
+after registration: all tests passed, ruff clean.
 
 **Zero logic-level bugs** — every issue above was scaffolding: a stray
 out-of-folder file, one file overwritten with the wrong content, needless

@@ -77,6 +77,16 @@ untouched in backend/tests/reference_models/ and can still be imported
 directly by anything that wants the reference specifically (e.g. the
 conformance suite's four-reference baseline check); it's just no longer
 in MODEL_MANIFEST, same as RefPCAModel and RefKMeansModel above.
+
+group_04_ann ships one ANNModel (new "ann" key) -- a configurable
+feed-forward MLP in PyTorch. Unlike every other registered model, its
+model_type is decided dynamically from y's dtype at fit() time rather
+than being a static property of the class (integer/boolean y ->
+classifier, float y -> regressor); get_metadata() falls back to
+"classifier" before fit() so the conformance suite's fixture-generation
+step has a valid value to key off of. See GROUP_04_ANN_LOG.md for the
+full submission history, including two closed PRs that were not part of
+the real submission.
 """
 import logging
 
@@ -91,6 +101,7 @@ from models.group_02_random_forest_xgboost.xgboost_model import XGBoostModel
 from models.group_03_rnn.gru import GRUModel
 from models.group_03_rnn.lstm import LSTMModel
 from models.group_03_rnn.rnn import RNNModel
+from models.group_04_ann.model import ANNModel
 from models.group_05_knn_kmeans_gmm.gmm import GMMModel
 from models.group_05_knn_kmeans_gmm.kmeans import KMeansModel
 from models.group_05_knn_kmeans_gmm.knn import KNNModel
@@ -130,6 +141,7 @@ MODEL_MANIFEST: dict[str, type] = {
     "dbscan": DBSCANModel,
     "hierarchical_clustering": HierarchicalClusteringModel,
     "cnn": CNNModel,
+    "ann": ANNModel,
 }
 
 
