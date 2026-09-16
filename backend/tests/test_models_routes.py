@@ -30,6 +30,7 @@ EXPECTED_TYPES = {
     "dbscan": "clusterer",
     "hierarchical_clustering": "clusterer",
     "cnn": "classifier",
+    "ann": "classifier",
 }
 
 
@@ -65,7 +66,7 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
-            "lda", "qda", "knn", "random_forest", "xgboost", "cnn",
+            "lda", "qda", "knn", "random_forest", "xgboost", "cnn", "ann",
         }
         assert set(incompatible) == {
             "kmeans", "rnn", "lstm", "gru", "regression", "gmm",
