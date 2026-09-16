@@ -1,25 +1,118 @@
 # Artificial Neural Network (MLP)
 
-## Model
-_One sentence describing what this model does._
+## Overview
 
-## Usage
-```python
-from models.group_04_ann.model import YourModel
-model = YourModel()
-model.fit(X_train, y_train)
-preds = model.predict(X_test)
-```
+This model implements a feed-forward Artificial Neural Network (ANN) using a Multi-Layer Perceptron (MLP) architecture.
+
+The model supports both:
+
+- Classification
+- Regression
+
+The implementation follows the project's standard `BaseModel` interface.
+
+## Architecture
+
+The neural network is built dynamically based on the selected hidden-layer sizes.
+
+The general architecture is:
+
+Input Layer
+→ Fully Connected Layer
+→ Batch Normalization
+→ Activation Function
+→ Dropout
+→ Hidden Layers
+→ Output Layer
+
+The output layer is automatically configured according to the task:
+
+- Classification: one output for each class
+- Regression: one continuous output
+
+## Supported Activation Functions
+
+The following activation functions are supported:
+
+- ReLU
+- Tanh
+- Leaky ReLU
+- ELU
 
 ## Hyperparameters
-| Name | Default | Controls |
-|---|---|---|
-|  |  |  |
 
-## Running the tests
-```bash
-python -m pytest test.py --cov=. --cov-report=term-missing
-```
+The model supports the following hyperparameters:
 
-## Design decisions
-_Why this algorithm, why these hyperparameters, and how behaviour changes if key choices are altered._
+| Parameter | Description |
+|---|---|
+| `hidden_sizes` | Number of neurons in each hidden layer |
+| `activation` | Activation function used in hidden layers |
+| `lr` | Learning rate |
+| `epochs` | Number of training epochs |
+| `batch_size` | Number of samples processed in each batch |
+| `dropout_rate` | Dropout probability |
+| `weight_decay` | L2 regularization parameter |
+| `random_state` | Random seed for reproducibility |
+
+## Model Methods
+
+### `fit(X, y)`
+
+Trains the ANN model using the supplied feature matrix and target values.
+
+The method automatically determines whether the task is classification or regression.
+
+### `predict(X)`
+
+Generates predictions for new input data.
+
+### `predict_proba(X)`
+
+Returns class probabilities for classification models.
+
+For regression models, this method returns `None`.
+
+### `get_metadata()`
+
+Returns model information including:
+
+- Model name
+- Model type
+- Hyperparameters
+- Training time
+- Number of features
+- Feature importance
+
+### `get_visualization_data()`
+
+Returns training information that can be used by the backend for visualization, including the loss history and number of epochs.
+
+## Testing
+
+Unit tests are provided in `test.py`.
+
+The tests cover:
+
+- Model initialization
+- Hyperparameter validation
+- Activation functions
+- Classification training and prediction
+- Regression training and prediction
+- Probability prediction
+- Input validation
+- Metadata
+- Visualization data
+- Prediction before fitting
+
+The tests use small deterministic datasets so that the ANN can be tested quickly and consistently.
+
+## Project Compatibility
+
+The implementation:
+
+- Inherits from `BaseModel`
+- Uses NumPy arrays as model inputs
+- Supports classification and regression
+- Runs on CPU
+- Does not perform data preprocessing
+- Provides the required model interface
