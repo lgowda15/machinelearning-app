@@ -7,7 +7,7 @@ import {
   parseCsvHeader,
   type ColumnMismatch,
 } from "../../lib/columns";
-import { usePrediction } from "../../hooks/usePrediction";
+import type { usePrediction } from "../../hooks/usePrediction";
 import type { DataProfileResponse } from "../../hooks/useDataset";
 import type { components } from "../../types/api";
 
@@ -20,6 +20,7 @@ type PredictMode = "csv" | "manual";
 interface PredictScreenProps {
   profile: DataProfileResponse;
   trainingResults: TrainResponse | null;
+  predictionState: ReturnType<typeof usePrediction>;
 }
 
 /**
@@ -32,8 +33,9 @@ interface PredictScreenProps {
 export function PredictScreen({
   profile,
   trainingResults,
+  predictionState,
 }: PredictScreenProps) {
-  const { result, loading, error, predict, reset } = usePrediction();
+  const { result, loading, error, predict, reset } = predictionState;
 
   const [modelKey, setModelKey] = useState(
     trainingResults?.results[0]?.model_key ?? "",

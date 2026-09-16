@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PredictScreen } from "./PredictScreen";
+import { usePrediction } from "../../hooks/usePrediction";
 import type { DataProfileResponse } from "../../hooks/useDataset";
 import type { components } from "../../types/api";
 
@@ -13,6 +14,26 @@ const { GET, POST } = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn() }));
 vi.mock("../../api/client", () => ({
   apiClient: { GET, POST },
 }));
+
+// App now instantiates usePrediction() and passes it down (predictionState
+// is lifted so a report can be built regardless of which screen is
+// mounted) -- mirror that wiring here instead of the screen owning the hook.
+function Harness({
+  profile,
+  trainingResults,
+}: {
+  profile: DataProfileResponse;
+  trainingResults: TrainResponse | null;
+}) {
+  const predictionState = usePrediction();
+  return (
+    <PredictScreen
+      profile={profile}
+      trainingResults={trainingResults}
+      predictionState={predictionState}
+    />
+  );
+}
 
 function column(name: string, isTarget = false): ColumnSummary {
   return {
@@ -62,7 +83,7 @@ function csvFile(content: string): File {
 
 describe("PredictScreen", () => {
   it("shows a notice with no trained results", () => {
-    render(<PredictScreen profile={profile} trainingResults={null} />);
+    render(<Harness profile={profile} trainingResults={null} />);
     expect(
       screen.getByText("Train at least one model before predicting on new data."),
     ).toBeInTheDocument();
@@ -70,7 +91,7 @@ describe("PredictScreen", () => {
 
   it("names missing and unexpected columns before sending any request", async () => {
     const user = userEvent.setup();
-    render(<PredictScreen profile={profile} trainingResults={trainingResults} />);
+    render(<Harness profile={profile} trainingResults={trainingResults} />);
 
     const input = document.getElementById("csv-upload") as HTMLInputElement;
     await user.upload(input, csvFile("a,extra\n1,2"));
@@ -99,7 +120,7 @@ describe("PredictScreen", () => {
       error: undefined,
     });
 
-    render(<PredictScreen profile={profile} trainingResults={trainingResults} />);
+    render(<Harness profile={profile} trainingResults={trainingResults} />);
 
     const input = document.getElementById("csv-upload") as HTMLInputElement;
     await user.upload(input, csvFile("a,b\n1,2\n3,4"));
@@ -120,7 +141,7 @@ describe("PredictScreen", () => {
     // earlier test made so ".not.toHaveBeenCalled()" below is about this
     // action, not the accumulated total.
     POST.mockClear();
-    render(<PredictScreen profile={profile} trainingResults={trainingResults} />);
+    render(<Harness profile={profile} trainingResults={trainingResults} />);
 
     await user.click(screen.getByRole("button", { name: "Enter values" }));
     await user.type(screen.getByLabelText(/^a /), "1");
@@ -151,7 +172,7 @@ describe("PredictScreen", () => {
       error: undefined,
     });
 
-    render(<PredictScreen profile={profile} trainingResults={trainingResults} />);
+    render(<Harness profile={profile} trainingResults={trainingResults} />);
 
     await user.click(screen.getByRole("button", { name: "Enter values" }));
     await user.type(screen.getByLabelText(/^a /), "1");

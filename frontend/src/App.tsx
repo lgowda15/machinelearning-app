@@ -9,7 +9,9 @@ import { ResultsScreen } from "./components/screens/ResultsScreen";
 import { StartScreen } from "./components/screens/StartScreen";
 import { TrainingScreen } from "./components/screens/TrainingScreen";
 import { UploadScreen } from "./components/screens/UploadScreen";
+import { useComparison } from "./hooks/useComparison";
 import { useModels } from "./hooks/useModels";
+import { usePrediction } from "./hooks/usePrediction";
 import { useTraining } from "./hooks/useTraining";
 import type { DataProfileResponse } from "./hooks/useDataset";
 import { STEPS, type StepId, type View } from "./types/steps";
@@ -37,9 +39,24 @@ function App() {
 
   const modelsState = useModels();
   const trainingState = useTraining();
+  const comparisonState = useComparison();
+  const predictionState = usePrediction();
 
   const { checkCompatibility } = modelsState;
   const { reset: resetTraining } = trainingState;
+  const { reset: resetComparison } = comparisonState;
+  const { reset: resetPrediction } = predictionState;
+
+  // A comparison or prediction is always made against the current training
+  // run. Whenever that run is invalidated (re-upload, re-profile, or a
+  // change to which models are selected), any comparison/prediction made
+  // against the previous run must be cleared too -- otherwise a stale
+  // result could survive into the report for a run it was never part of.
+  const resetCycle = useCallback(() => {
+    resetTraining();
+    resetComparison();
+    resetPrediction();
+  }, [resetTraining, resetComparison, resetPrediction]);
 
   const currentStepIndex =
     view === "start" ? -1 : STEPS.findIndex((s) => s.id === view);
@@ -58,9 +75,9 @@ function App() {
     if (!profile) return;
 
     setSelectedModelKeys([]);
-    resetTraining();
+    resetCycle();
     checkCompatibility(profile.data_id);
-  }, [profile, checkCompatibility, resetTraining]);
+  }, [profile, checkCompatibility, resetCycle]);
 
   const toggleModel = useCallback(
     (key: string) => {
@@ -70,7 +87,7 @@ function App() {
           : [...prev, key],
       );
 
-      resetTraining();
+      resetCycle();
 
       setMaxStepIndexReached((m) =>
         Math.min(
@@ -79,7 +96,7 @@ function App() {
         ),
       );
     },
-    [resetTraining],
+    [resetCycle],
   );
 
   const isStepComplete: Partial<Record<StepId, boolean>> = {
@@ -203,6 +220,7 @@ function App() {
               <PredictScreen
                 profile={profile}
                 trainingResults={trainingState.results}
+                predictionState={predictionState}
               />
             ) : (
               <NoDatasetNotice />
@@ -212,6 +230,7 @@ function App() {
             return profile ? (
               <CompareScreen
                 trainingResults={trainingState.results}
+                comparisonState={comparisonState}
               />
             ) : (
               <NoDatasetNotice />

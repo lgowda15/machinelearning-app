@@ -17,13 +17,14 @@ import {
   typeColorVar,
   typeTextClass,
 } from "../../lib/modelType";
-import { useComparison } from "../../hooks/useComparison";
+import type { useComparison } from "../../hooks/useComparison";
 import type { components } from "../../types/api";
 
 type TrainResponse = components["schemas"]["TrainResponse"];
 
 interface CompareScreenProps {
   trainingResults: TrainResponse | null;
+  comparisonState: ReturnType<typeof useComparison>;
 }
 
 const OPACITY_STEPS = [1, 0.7, 0.45, 0.25];
@@ -37,8 +38,9 @@ const OPACITY_STEPS = [1, 0.7, 0.45, 0.25];
  */
 export function CompareScreen({
   trainingResults,
+  comparisonState,
 }: CompareScreenProps) {
-  const { result, loading, error, compare, reset } = useComparison();
+  const { result, loading, error, compare, reset } = comparisonState;
   const [selected, setSelected] = useState<string[]>([]);
 
   if (!trainingResults || trainingResults.results.length === 0) {
