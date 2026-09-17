@@ -14,6 +14,7 @@ import { useModels } from "./hooks/useModels";
 import { usePrediction } from "./hooks/usePrediction";
 import { useTraining } from "./hooks/useTraining";
 import type { DataProfileResponse } from "./hooks/useDataset";
+import type { CycleState } from "./lib/report/types";
 import { STEPS, type StepId, type View } from "./types/steps";
 
 const DEFAULT_TEST_SIZE = 0.2;
@@ -41,6 +42,11 @@ function App() {
   const trainingState = useTraining();
   const comparisonState = useComparison();
   const predictionState = usePrediction();
+  // Paired with predictionState.result at click time (see onPredictionInput
+  // below) to build CycleState.prediction.inputSummary for the PDF report --
+  // the one piece of the prediction cycle usePrediction's own state doesn't
+  // carry, since it describes how the input was provided, not the result.
+  const [predictionInputSummary, setPredictionInputSummary] = useState<string | null>(null);
 
   const { checkCompatibility } = modelsState;
   const { reset: resetTraining } = trainingState;
@@ -119,6 +125,22 @@ function App() {
     currentStepIndex < STEPS.length - 1 &&
     currentComplete;
 
+  // Assembled fresh each render from state already resident here -- no new
+  // fetch layer needed (docs/plans/pdf-report.md's CycleState). Comparison's
+  // selected keys and metrics table are derived later, inside
+  // buildReportModel, straight from comparisonState.result and
+  // trainingState.results -- not tracked separately here.
+  const cycle: CycleState = {
+    profile,
+    testSize,
+    trainingResults: trainingState.results,
+    comparisonResult: comparisonState.result,
+    prediction:
+      predictionState.result && predictionInputSummary
+        ? { inputSummary: predictionInputSummary, result: predictionState.result }
+        : null,
+  };
+
   /*
    * START SCREEN
    *
@@ -161,6 +183,7 @@ function App() {
         )
       }
       renderStart={() => null}
+      cycle={cycle}
       renderStep={(step) => {
         switch (step) {
           case "upload":
@@ -221,6 +244,7 @@ function App() {
                 profile={profile}
                 trainingResults={trainingState.results}
                 predictionState={predictionState}
+                onPredictionInput={setPredictionInputSummary}
               />
             ) : (
               <NoDatasetNotice />

@@ -7,6 +7,7 @@ import {
   parseCsvHeader,
   type ColumnMismatch,
 } from "../../lib/columns";
+import { formatPredictionValue } from "../../lib/format";
 import type { usePrediction } from "../../hooks/usePrediction";
 import type { DataProfileResponse } from "../../hooks/useDataset";
 import type { components } from "../../types/api";
@@ -21,6 +22,10 @@ interface PredictScreenProps {
   profile: DataProfileResponse;
   trainingResults: TrainResponse | null;
   predictionState: ReturnType<typeof usePrediction>;
+  // Called right before each predict() so App can pair a description of how
+  // the input was provided with the result for the PDF report -- the only
+  // piece of the prediction cycle usePrediction's own state doesn't carry.
+  onPredictionInput: (summary: string) => void;
 }
 
 /**
@@ -34,6 +39,7 @@ export function PredictScreen({
   profile,
   trainingResults,
   predictionState,
+  onPredictionInput,
 }: PredictScreenProps) {
   const { result, loading, error, predict, reset } = predictionState;
 
@@ -100,6 +106,7 @@ export function PredictScreen({
   const handlePredictCsv = () => {
     if (!file || mismatch) return;
 
+    onPredictionInput(`CSV upload: ${file.name}`);
     predict(trainingResults.training_id, modelKey, file);
   };
 
@@ -143,6 +150,7 @@ export function PredictScreen({
       { type: "text/csv" },
     );
 
+    onPredictionInput("Manual entry");
     predict(
       trainingResults.training_id,
       modelKey,
@@ -555,26 +563,6 @@ export function PredictScreen({
 /* Prediction formatting                                                     */
 /* -------------------------------------------------------------------------- */
 
-function formatPrediction(value: unknown): string {
-  if (Array.isArray(value)) {
-    return value
-      .map((v) =>
-        typeof v === "number"
-          ? v.toFixed(4)
-          : String(v),
-      )
-      .join(", ");
-  }
-
-  if (typeof value === "number") {
-    return Number.isInteger(value)
-      ? String(value)
-      : value.toFixed(4);
-  }
-
-  return String(value);
-}
-
 /* -------------------------------------------------------------------------- */
 /* Prediction results                                                         */
 /* -------------------------------------------------------------------------- */
@@ -643,7 +631,7 @@ function PredictionTable({
                 </td>
 
                 <td className="px-4 py-3 font-mono text-sm text-ink">
-                  {formatPrediction(prediction)}
+                  {formatPredictionValue(prediction)}
                 </td>
 
                 {result.probabilities && (

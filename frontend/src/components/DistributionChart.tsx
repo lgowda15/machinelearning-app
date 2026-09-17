@@ -1,4 +1,5 @@
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartFrame } from "./charts/ChartFrame";
 import { bucketsForColumn, topBucketCaption } from "../lib/distribution";
 import type { components } from "../types/api";
 
@@ -12,13 +13,24 @@ interface DistributionChartProps {
   // data_type will train (EdaScreen.tsx), not always --signal. Every
   // non-target column stays --ink regardless.
   targetAccentVar: string;
+  // Set together only for the PDF report's off-screen capture
+  // (docs/plans/pdf-report.md's captureChartSvg) -- see ChartFrame.
+  width?: number;
+  height?: number;
+  isAnimationActive?: boolean;
 }
 
 /** One column's distribution -- screen 2's right column, target first
  * (frontend.md). The target's chart is the "series in focus": it gets the
  * accent colour, everything else --ink. A text caption carries the same key
  * number for the quality floor's "text alternatives" requirement. */
-export function DistributionChart({ column, targetAccentVar }: DistributionChartProps) {
+export function DistributionChart({
+  column,
+  targetAccentVar,
+  width,
+  height,
+  isAnimationActive,
+}: DistributionChartProps) {
   const buckets = bucketsForColumn(column);
   const caption = topBucketCaption(buckets);
   const barColor = column.is_target ? targetAccentVar : "var(--color-ink)";
@@ -41,34 +53,32 @@ export function DistributionChart({ column, targetAccentVar }: DistributionChart
         )}
       </div>
       {buckets.length > 0 ? (
-        <div className="mt-2 h-40">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={buckets} margin={{ top: 4, right: 4, left: 4, bottom: 4 }}>
-              <CartesianGrid stroke="var(--color-rule)" vertical={false} />
-              <XAxis
-                dataKey="label"
-                tick={AXIS_TICK}
-                interval={0}
-                angle={-30}
-                textAnchor="end"
-                height={40}
-              />
-              <YAxis tick={AXIS_TICK} allowDecimals={false} width={32} />
-              <Tooltip
-                contentStyle={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-rule)",
-                  borderRadius: 4,
-                  boxShadow: "none",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: 12,
-                }}
-                cursor={{ fill: "var(--color-rule)", opacity: 0.3 }}
-              />
-              <Bar dataKey="count" fill={barColor} radius={0} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ChartFrame className="mt-2 h-40" width={width} height={height}>
+          <BarChart data={buckets} margin={{ top: 4, right: 4, left: 4, bottom: 4 }}>
+            <CartesianGrid stroke="var(--color-rule)" vertical={false} />
+            <XAxis
+              dataKey="label"
+              tick={AXIS_TICK}
+              interval={0}
+              angle={-30}
+              textAnchor="end"
+              height={40}
+            />
+            <YAxis tick={AXIS_TICK} allowDecimals={false} width={32} />
+            <Tooltip
+              contentStyle={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-rule)",
+                borderRadius: 4,
+                boxShadow: "none",
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+              }}
+              cursor={{ fill: "var(--color-rule)", opacity: 0.3 }}
+            />
+            <Bar dataKey="count" fill={barColor} radius={0} isAnimationActive={isAnimationActive} />
+          </BarChart>
+        </ChartFrame>
       ) : (
         <p className="mt-2 text-sm text-muted">No values to chart.</p>
       )}

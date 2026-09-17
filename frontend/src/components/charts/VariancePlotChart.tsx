@@ -1,8 +1,13 @@
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartFrame } from "./ChartFrame";
 import { AXIS_TICK, TOOLTIP_STYLE } from "./chartTheme";
 
 interface VariancePlotChartProps {
   explainedVarianceRatio: (number | null)[];
+  // Set together only for the PDF report's off-screen capture -- see ChartFrame.
+  width?: number;
+  height?: number;
+  isAnimationActive?: boolean;
 }
 
 /** Screen 5's dimensionality-reducer chart (frontend.md): explained
@@ -12,7 +17,12 @@ interface VariancePlotChartProps {
  * non-PCA-specific computation) -- rendered as an empty bar rather than
  * silently treated as zero, so a genuinely undefined value isn't shown as
  * "no variance". */
-export function VariancePlotChart({ explainedVarianceRatio }: VariancePlotChartProps) {
+export function VariancePlotChart({
+  explainedVarianceRatio,
+  width,
+  height,
+  isAnimationActive,
+}: VariancePlotChartProps) {
   const data = explainedVarianceRatio.map((ratio, i) => ({
     label: `PC${i + 1}`,
     ratio,
@@ -24,17 +34,15 @@ export function VariancePlotChart({ explainedVarianceRatio }: VariancePlotChartP
 
   return (
     <div>
-      <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
-            <CartesianGrid stroke="var(--color-rule)" vertical={false} />
-            <XAxis dataKey="label" tick={AXIS_TICK} />
-            <YAxis tick={AXIS_TICK} width={40} />
-            <Tooltip {...TOOLTIP_STYLE} cursor={{ fill: "var(--color-rule)", opacity: 0.3 }} />
-            <Bar dataKey="ratio" fill="var(--color-type-reduce)" radius={0} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <ChartFrame className="h-56" width={width} height={height}>
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+          <CartesianGrid stroke="var(--color-rule)" vertical={false} />
+          <XAxis dataKey="label" tick={AXIS_TICK} />
+          <YAxis tick={AXIS_TICK} width={40} />
+          <Tooltip {...TOOLTIP_STYLE} cursor={{ fill: "var(--color-rule)", opacity: 0.3 }} />
+          <Bar dataKey="ratio" fill="var(--color-type-reduce)" radius={0} isAnimationActive={isAnimationActive} />
+        </BarChart>
+      </ChartFrame>
       <p className="mt-1 font-mono text-xs text-muted">
         {definedTotal.toFixed(4)} cumulative variance explained
         {hasUndefined ? " (some components undefined -- zero-variance test split)" : ""}

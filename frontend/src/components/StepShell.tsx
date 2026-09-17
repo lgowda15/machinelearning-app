@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { DownloadReportButton } from "./DownloadReportButton";
 import { Logo } from "./Logo";
 import { StepIndicator } from "./StepIndicator";
+import type { CycleState } from "../lib/report/types";
 import type { StepId, View } from "../types/steps";
 
 interface StepShellProps {
@@ -13,6 +15,7 @@ interface StepShellProps {
   onForward: () => void;
   renderStart: () => ReactNode;
   renderStep: (step: StepId) => ReactNode;
+  cycle: CycleState;
 }
 
 /**
@@ -33,6 +36,7 @@ export function StepShell({
   onForward,
   renderStart,
   renderStep,
+  cycle,
 }: StepShellProps) {
   const isStart = view === "start";
 
@@ -49,8 +53,9 @@ export function StepShell({
     />
   </div>
 
-  {/* Logo stays on the right */}
-  <div className="ml-auto">
+  {/* Download report and logo stay on the right */}
+  <div className="ml-auto flex items-center gap-4">
+    {!isStart && <DownloadReportButton cycle={cycle} />}
     <Logo variant="mark" className="h-9 w-9" />
   </div>
 </header>

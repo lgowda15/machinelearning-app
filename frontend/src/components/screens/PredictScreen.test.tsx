@@ -31,6 +31,7 @@ function Harness({
       profile={profile}
       trainingResults={trainingResults}
       predictionState={predictionState}
+      onPredictionInput={() => {}}
     />
   );
 }
