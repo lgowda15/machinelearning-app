@@ -87,6 +87,21 @@ classifier, float y -> regressor); get_metadata() falls back to
 step has a valid value to key off of. See GROUP_04_ANN_LOG.md for the
 full submission history, including two closed PRs that were not part of
 the real submission.
+
+group_08_hmm_naive_bayes ships two classifier algorithms in one folder
+-- HMMModel ("hmm") and NaiveBayesModel ("naive_bayes") -- same
+plain-algorithm-name convention as group_01/02/03/09/11. The group's
+code merged in PR #57 but was never added here, so it never appeared in
+the registry or the UI until now. HMMModel declares
+EXPECTED_N_FEATURES = 10 (a fixed 5-timestep, 2-feature-per-step
+sequence schema, same precedent as group_07_cnn's fixed 784) -- the
+conformance suite's fixture generator already honours any model's own
+EXPECTED_N_FEATURES, so no suite change was needed. Compatibility is
+still decided by model_type vs. data_type only (app/core/compatibility.py),
+same as every other model with a fixed input shape: HMMModel shows as
+compatible with any classification dataset and raises a clear
+ValueError at fit()-time if that dataset doesn't have exactly 10
+feature columns.
 """
 import logging
 
@@ -107,6 +122,8 @@ from models.group_05_knn_kmeans_gmm.kmeans import KMeansModel
 from models.group_05_knn_kmeans_gmm.knn import KNNModel
 from models.group_06_regression.model import RegressionModel
 from models.group_07_cnn.model import CNNModel
+from models.group_08_hmm_naive_bayes.hmm import HMMModel
+from models.group_08_hmm_naive_bayes.naive_bayes import NaiveBayesModel
 from models.group_09_dbscan_hierarchical.dbscan import DBSCANModel
 from models.group_09_dbscan_hierarchical.hierarchical import (
     HierarchicalClusteringModel,
@@ -142,6 +159,8 @@ MODEL_MANIFEST: dict[str, type] = {
     "hierarchical_clustering": HierarchicalClusteringModel,
     "cnn": CNNModel,
     "ann": ANNModel,
+    "hmm": HMMModel,
+    "naive_bayes": NaiveBayesModel,
 }
 
 
