@@ -31,6 +31,8 @@ EXPECTED_TYPES = {
     "hierarchical_clustering": "clusterer",
     "cnn": "classifier",
     "ann": "classifier",
+    "hmm": "classifier",
+    "naive_bayes": "classifier",
 }
 
 
@@ -66,7 +68,7 @@ class TestCompatibility:
 
         assert compatible_keys == {
             "logistic_regression", "pca", "cart", "chaid", "id3", "oblique_tree", "svm",
-            "lda", "qda", "knn", "random_forest", "xgboost", "cnn", "ann",
+            "lda", "qda", "knn", "random_forest", "xgboost", "cnn", "ann", "hmm", "naive_bayes",
         }
         assert set(incompatible) == {
             "kmeans", "rnn", "lstm", "gru", "regression", "gmm",
