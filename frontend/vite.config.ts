@@ -12,7 +12,7 @@ export default defineConfig({
       // same-origin, without the backend needing CORS config. Production
       // gets the backend URL baked in at build time (ARCHITECTURE.md §11).
       "/api": {
-        target: "http://localhost:6060",
+        target: "http://localhost:8050",
         changeOrigin: true,
       },
     },
