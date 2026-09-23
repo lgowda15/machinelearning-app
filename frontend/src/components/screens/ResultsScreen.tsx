@@ -17,21 +17,15 @@ import type {
   TreeStructurePayload,
 } from "../../types/visualizationData";
 
-type TrainedModelResponse = components["schemas"]["TrainedModelResponse"];
+type TrainedModelResponse =
+  components["schemas"]["TrainedModelResponse"];
+
 type TrainResponse = components["schemas"]["TrainResponse"];
 
 interface ResultsScreenProps {
   results: TrainResponse | null;
 }
 
-/**
- * Screen 5:
- * - Overview of the completed training run
- * - One visual result card per trained model
- * - Key metrics shown prominently
- * - Type-specific visualisation
- * - Feature importance / model-specific visualisations where available
- */
 export function ResultsScreen({ results }: ResultsScreenProps) {
   if (!results || results.results.length === 0) {
     return (
@@ -55,50 +49,65 @@ export function ResultsScreen({ results }: ResultsScreenProps) {
   }
 
   const totalTrainingTime = results.results.reduce(
-    (total, result) => total + (result.training_time_seconds ?? 0),
+    (total, result) =>
+      total + (result.training_time_seconds ?? 0),
     0,
   );
 
   return (
     <ScreenPanel maxWidthClassName={WORKSPACE_WIDTH}>
       {/* Page heading */}
-      <div className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-wider text-muted">
+      <div className="mb-5">
+        <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
           Training complete
         </p>
 
-        <h1 className="mt-1 text-xl font-semibold text-ink">
+        <h1 className="mt-1 text-xl font-semibold tracking-tight text-ink">
           Results
         </h1>
 
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-xs text-muted">
           Review the performance and visual output of each trained model.
         </p>
       </div>
 
       {/* Overview cards */}
-      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
         <OverviewCard
           label="Models trained"
           value={String(results.results.length)}
-          detail="Models completed successfully"
         />
 
         <OverviewCard
           label="Test split"
           value={`${Math.round(results.test_size * 100)}%`}
-          detail="Data used for evaluation"
         />
 
         <OverviewCard
           label="Training time"
           value={`${totalTrainingTime.toFixed(2)}s`}
-          detail="Total model training time"
         />
       </div>
 
-      {/* Model results */}
-      <div className="space-y-6">
+      {/* Model results heading */}
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-ink">
+            Model results
+          </h2>
+
+          <p className="mt-0.5 text-[10px] text-muted">
+            Performance and visual output for each trained model.
+          </p>
+        </div>
+
+        <span className="shrink-0 rounded-full bg-ground px-2.5 py-1 font-mono text-[9px] text-muted">
+          {results.results.length} trained
+        </span>
+      </div>
+
+      {/* 2 × 2 model grid */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {results.results.map((result, index) => (
           <ResultPanel
             key={result.model_key}
@@ -118,31 +127,25 @@ export function ResultsScreen({ results }: ResultsScreenProps) {
 function OverviewCard({
   label,
   value,
-  detail,
 }: {
   label: string;
   value: string;
-  detail: string;
 }) {
   return (
-    <div className="rounded-panel border border-rule bg-ground px-4 py-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">
+    <div className="rounded-panel border border-rule bg-ground px-4 py-3">
+      <p className="text-[9px] font-medium uppercase tracking-wide text-muted">
         {label}
       </p>
 
-      <p className="mt-2 font-mono text-2xl font-medium text-ink">
+      <p className="mt-1 font-mono text-xl font-medium text-ink">
         {value}
-      </p>
-
-      <p className="mt-1 text-xs text-muted">
-        {detail}
       </p>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Individual result                                                          */
+/* Individual result card                                                     */
 /* -------------------------------------------------------------------------- */
 
 function ResultPanel({
@@ -157,32 +160,32 @@ function ResultPanel({
 
   return (
     <section
-      className={`
+      className="
         overflow-hidden
         rounded-panel
         border
         border-rule
         bg-surface
         shadow-sm
-      `}
+      "
     >
       {/* Model header */}
-      <div className="border-b border-rule px-5 py-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
+      <div className="border-b border-rule px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
             <div
               className={`
                 flex
-                h-8
-                w-8
+                h-7
+                w-7
                 shrink-0
                 items-center
                 justify-center
                 rounded-panel
                 border
-                ${typeBorder}
                 font-mono
-                text-xs
+                text-[10px]
+                ${typeBorder}
                 ${typeText}
               `}
             >
@@ -190,14 +193,14 @@ function ResultPanel({
             </div>
 
             <div className="min-w-0">
-              <h2 className="text-base font-semibold text-ink">
+              <h3 className="truncate text-sm font-semibold text-ink">
                 {result.model_name}
-              </h2>
+              </h3>
 
-              <p className="mt-1 font-mono text-xs text-muted">
+              <p className="mt-0.5 font-mono text-[9px] text-muted">
                 {result.n_features} features
                 {result.training_time_seconds != null &&
-                  ` · ${result.training_time_seconds.toFixed(3)}s training time`}
+                  ` · ${result.training_time_seconds.toFixed(3)}s`}
               </p>
             </div>
           </div>
@@ -207,10 +210,10 @@ function ResultPanel({
               shrink-0
               rounded-full
               bg-ground
-              px-2.5
+              px-2
               py-1
               font-mono
-              text-[10px]
+              text-[8px]
               font-medium
               uppercase
               tracking-wide
@@ -222,51 +225,60 @@ function ResultPanel({
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="border-b border-rule px-5 py-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-xs font-medium uppercase tracking-wide text-muted">
-            Performance
-          </h3>
+      {/* -------------------------------------------------------------- */}
+      {/* VISUALISATION — graph first                                    */}
+      {/* -------------------------------------------------------------- */}
 
-          <span className="font-mono text-[10px] text-muted">
+      <div className="border-b border-rule px-4 py-3">
+        <div className="mb-2 flex items-center justify-between">
+          <h4 className="text-[9px] font-medium uppercase tracking-wide text-muted">
+            Visualisation
+          </h4>
+        </div>
+
+        <div className="overflow-hidden rounded-panel border border-rule bg-ground p-2">
+          <div className="min-h-[180px]">
+            <TypeChart result={result} />
+          </div>
+        </div>
+      </div>
+
+      {/* -------------------------------------------------------------- */}
+      {/* PERFORMANCE — short section below graph                       */}
+      {/* -------------------------------------------------------------- */}
+
+      <div className="border-b border-rule px-4 py-3">
+        <div className="mb-2 flex items-center justify-between">
+          <h4 className="text-[9px] font-medium uppercase tracking-wide text-muted">
+            Performance
+          </h4>
+
+          <span className="font-mono text-[8px] text-muted">
             EVALUATION
           </span>
         </div>
 
-        <MetricsList
-          metrics={result.metrics}
-          omit={metricsOmitFor(result.model_type)}
-        />
-      </div>
-
-      {/* Main visualisation */}
-      <div className="border-b border-rule px-5 py-5">
-        <div className="mb-3">
-          <h3 className="text-xs font-medium uppercase tracking-wide text-muted">
-            Visualisation
-          </h3>
-        </div>
-
-        <div className="overflow-hidden rounded-panel border border-rule bg-ground p-3">
-          <TypeChart result={result} />
+        <div className="compact-metrics">
+          <MetricsList
+            metrics={result.metrics}
+            omit={metricsOmitFor(result.model_type)}
+          />
         </div>
       </div>
 
-      {/* Feature importance */}
+      {/* -------------------------------------------------------------- */}
+      {/* FEATURE IMPORTANCE                                             */}
+      {/* -------------------------------------------------------------- */}
+
       {result.feature_importance && (
-        <div className="border-b border-rule px-5 py-5">
-          <div className="mb-3">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted">
+        <div className="border-b border-rule px-4 py-3">
+          <div className="mb-2">
+            <h4 className="text-[9px] font-medium uppercase tracking-wide text-muted">
               Feature importance
-            </h3>
-
-            <p className="mt-1 text-xs text-muted">
-              Relative contribution of each feature to the model.
-            </p>
+            </h4>
           </div>
 
-          <div className="overflow-hidden rounded-panel border border-rule bg-ground p-3">
+          <div className="overflow-hidden rounded-panel border border-rule bg-ground p-2">
             <FeatureImportanceChart
               featureImportance={result.feature_importance}
             />
@@ -274,16 +286,19 @@ function ResultPanel({
         </div>
       )}
 
-      {/* Model-specific visualisation */}
+      {/* -------------------------------------------------------------- */}
+      {/* MODEL-SPECIFIC OUTPUT                                          */}
+      {/* -------------------------------------------------------------- */}
+
       {result.visualization_data && (
-        <div className="px-5 py-5">
-          <div className="mb-3">
-            <h3 className="text-xs font-medium uppercase tracking-wide text-muted">
+        <div className="px-4 py-3">
+          <div className="mb-2">
+            <h4 className="text-[9px] font-medium uppercase tracking-wide text-muted">
               Model-specific output
-            </h3>
+            </h4>
           </div>
 
-          <div className="overflow-hidden rounded-panel border border-rule bg-ground p-3">
+          <div className="overflow-hidden rounded-panel border border-rule bg-ground p-2">
             <ModelSpecificVisual
               result={result}
               data={result.visualization_data}
@@ -299,9 +314,6 @@ function ResultPanel({
 /* Model-specific visualisation                                               */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Dispatches visualization_data to the chart built for its specific shape.
- */
 function ModelSpecificVisual({
   result,
   data,
@@ -388,7 +400,9 @@ function TypeChart({
 
       if (!plotData) {
         return (
-          <NoChart reason="No cluster scatter data returned for this run." />
+          <NoChart
+            reason="No cluster scatter data returned for this run."
+          />
         );
       }
 
@@ -408,7 +422,9 @@ function TypeChart({
 
       if (!plotData) {
         return (
-          <NoChart reason="No predicted-vs-actual data returned for this run." />
+          <NoChart
+            reason="No predicted-vs-actual data returned for this run."
+          />
         );
       }
 
@@ -445,7 +461,9 @@ function TypeChart({
 function NoChart({ reason }: { reason: string }) {
   return (
     <div className="flex min-h-32 items-center justify-center text-center">
-      <p className="max-w-md text-sm text-muted">{reason}</p>
+      <p className="max-w-md text-xs text-muted">
+        {reason}
+      </p>
     </div>
   );
 }
@@ -460,7 +478,7 @@ function ModelVisualizationDump({
   data: Record<string, unknown>;
 }) {
   return (
-    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 font-mono text-xs">
+    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 font-mono text-[10px]">
       {Object.entries(data).map(([key, value]) => (
         <Fragment key={key}>
           <dt className="text-muted">{key}</dt>

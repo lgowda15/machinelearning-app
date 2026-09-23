@@ -53,16 +53,16 @@ export function Dropzone({
       className={`
         relative
         flex
-        min-h-44
+        min-h-36
         flex-col
         items-center
         justify-center
-        gap-3
+        gap-2
         rounded-panel
         border-2
         border-dashed
-        px-6
-        py-8
+        px-5
+        py-5
         text-center
         transition-all
         duration-150
@@ -81,8 +81,8 @@ export function Dropzone({
       <div
         className={`
           flex
-          h-12
-          w-12
+          h-10
+          w-10
           items-center
           justify-center
           rounded-full
@@ -103,10 +103,12 @@ export function Dropzone({
       </div>
 
       {/* Main action */}
-      <div>
+      <div className="min-w-0 max-w-full">
         <label
           htmlFor={inputId}
           className={`
+            block
+            truncate
             text-sm
             font-medium
             ${
@@ -126,14 +128,14 @@ export function Dropzone({
         </label>
 
         {!loading && hasFile && (
-          <p className="mt-1 text-xs text-signal">
+          <p className="mt-0.5 text-[11px] text-signal">
             File selected
           </p>
         )}
       </div>
 
       {/* File requirements */}
-      <span className="font-mono text-[10px] uppercase tracking-wide text-muted">
+      <span className="font-mono text-[9px] uppercase tracking-wide text-muted">
         CSV · 50+ rows · ≤100 columns
       </span>
 

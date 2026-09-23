@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { Logo } from "./Logo";
 import { StepIndicator } from "./StepIndicator";
 import type { StepId, View } from "../types/steps";
 
@@ -40,23 +39,27 @@ export function StepShell({
     <div className="flex min-h-screen flex-col bg-ground">
       {/* Header */}
       <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center border-b border-black/20 bg-brand-navy px-6">
-  {/* Centered step navigation */}
-  <div className="absolute left-1/2 w-max max-w-[calc(100%-7rem)] -translate-x-1/2">
-    <StepIndicator
-      currentStep={isStart ? null : view}
-      maxStepIndexReached={isStart ? -1 : maxStepIndexReached}
-      onNavigate={onNavigateToStep}
-    />
-  </div>
+        {/* Centered step navigation */}
+        <div className="absolute left-1/2 w-max max-w-[calc(100%-7rem)] -translate-x-1/2">
+          <StepIndicator
+            currentStep={isStart ? null : view}
+            maxStepIndexReached={isStart ? -1 : maxStepIndexReached}
+            onNavigate={onNavigateToStep}
+          />
+        </div>
 
-  {/* Logo stays on the right */}
-  <div className="ml-auto">
-    <Logo variant="mark" className="h-9 w-9" />
-  </div>
-</header>
+        {/* PES University logo */}
+        <div className="ml-auto flex items-center">
+          <img
+            src="/pes-logo.jpeg"
+            alt="PES University"
+            className="h-10 w-auto object-contain"
+          />
+        </div>
+      </header>
 
       {/* Main content */}
-      <main className="flex-1 px-6 py-8 pb-28">
+      <main className="min-h-0 flex-1 px-4 py-2 pb-20">
         {isStart ? renderStart() : renderStep(view)}
       </main>
 

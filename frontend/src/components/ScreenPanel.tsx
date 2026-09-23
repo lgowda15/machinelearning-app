@@ -39,8 +39,8 @@ export function ScreenPanel({
         border
         border-rule
         bg-surface
-        px-8
-        py-7
+        px-6
+        py-4
         text-ink
         shadow-sm
       `}
