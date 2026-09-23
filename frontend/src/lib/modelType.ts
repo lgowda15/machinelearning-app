@@ -16,7 +16,7 @@ export function isModelType(value: string): value is ModelType {
 }
 
 const TYPE_COLOR_VAR: Record<ModelType, string> = {
-  classifier: "var(--color-signal)",
+  classifier: "var(--color-type-classifier)",
   clusterer: "var(--color-type-cluster)",
   regressor: "var(--color-type-regress)",
   dimensionality_reducer: "var(--color-type-reduce)",
@@ -28,7 +28,7 @@ export function typeColorVar(modelType: string): string {
 }
 
 const TYPE_CLASSES: Record<ModelType, { border: string; text: string }> = {
-  classifier: { border: "border-signal", text: "text-signal" },
+  classifier: { border: "border-type-classifier", text: "text-type-classifier" },
   clusterer: { border: "border-type-cluster", text: "text-type-cluster" },
   regressor: { border: "border-type-regress", text: "text-type-regress" },
   dimensionality_reducer: { border: "border-type-reduce", text: "text-type-reduce" },

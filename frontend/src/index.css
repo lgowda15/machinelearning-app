@@ -12,20 +12,80 @@
  */
 
 @theme {
-  --color-ground: #f5f6f8;
+  /* Surfaces, text, hairlines -- darkened one step from the original set for
+   * legibility on a TV viewed from across a room (frontend.md). */
+  --color-ground: #e3e6ec;
   --color-surface: #ffffff;
   --color-surface-alt: #eef1f5;
-  --color-rule: #d8dde4;
+  --color-rule: #b0b9c4;
   --color-ink: #16203d;
-  --color-muted: #6b7480;
-  --color-signal: #1b6ef3;
-  --color-brand-navy: #16234f;
-  --color-brand-gold: #d98a24;
+  --color-muted: #535c68;
 
-  /* Model-type colours */
+  /* Informational blue -- NOT a primary action colour. Reserved for: the
+   * active step in the stepper, selected/focused states, and links. See
+   * --color-orange-* for primary actions. */
+  --color-signal: #1b6ef3;
+
+  /* Primary action colour (Begin, Continue, Predict, slider fill, primary
+   * buttons). orange-500 is the PES compass-gold brand hex, unchanged;
+   * orange-700 is the button shade -- darkened until white text on it clears
+   * WCAG AA (5.50:1). */
+  --color-orange-50: #fcf6ee;
+  --color-orange-100: #f8e9d5;
+  --color-orange-200: #f1d3ac;
+  --color-orange-300: #e9b97c;
+  --color-orange-400: #e2a250;
+  --color-orange-500: #d98a24;
+  --color-orange-600: #b3721e;
+  --color-orange-700: #935d18;
+  --color-orange-800: #724813;
+  --color-orange-900: #51330d;
+
+  /* PES navy scale. navy-900 is the original --brand-navy hex, unchanged --
+   * shell header, logo surround, step indicator rail. */
+  --color-navy-50: #eff2fb;
+  --color-navy-100: #d7def4;
+  --color-navy-200: #afbce9;
+  --color-navy-300: #7f94db;
+  --color-navy-400: #4c69cd;
+  --color-navy-500: #304cab;
+  --color-navy-600: #263c88;
+  --color-navy-700: #1e306c;
+  --color-navy-800: #1a295c;
+  --color-navy-900: #16234f;
+
+  /* Model-type colours -- four fixed, distinguishable hues (validated for
+   * deuteranopia/protanopia separation and a normal-vision floor with
+   * scripts/validate_palette.js from the dataviz skill; classifier is
+   * deliberately NOT --color-signal, so "informational blue" and "this is a
+   * classifier" never read as the same signal). Always pair with the type's
+   * text label -- colour is never the only cue. */
+  --color-type-classifier: #2255a4;
   --color-type-cluster: #1e9e6b;
-  --color-type-regress: #d98a24;
-  --color-type-reduce: #7a4fd1;
+  --color-type-regress: #c4453a;
+  --color-type-reduce: #9b5fe0;
+
+  /* Categorical scale for multi-model comparison charts (e.g. Compare's bar
+   * chart) -- ordered, adjacent entries validated distinct at small sizes.
+   * Assign by selection order, never cycle arbitrarily. */
+  --color-data-1: #2a78d6;
+  --color-data-2: #eb6834;
+  --color-data-3: #1baf7a;
+  --color-data-4: #eda100;
+  --color-data-5: #e87ba4;
+  --color-data-6: #008300;
+  --color-data-7: #4a3aa7;
+  --color-data-8: #e34948;
+  --color-data-9: #1670a3;
+  --color-data-10: #a8621c;
+
+  /* Sequential scale (single hue, light to dark) for the confusion matrix --
+   * cell colour encodes magnitude, never a categorical/type colour. */
+  --color-scale-1: #eaf1fc;
+  --color-scale-2: #bfd7f5;
+  --color-scale-3: #7fa9e8;
+  --color-scale-4: #3f73c9;
+  --color-scale-5: #1f4c99;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;

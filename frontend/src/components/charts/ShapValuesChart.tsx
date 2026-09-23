@@ -1,4 +1,5 @@
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis } from "recharts";
+import { ChartFrame } from "./ChartFrame";
 import { AXIS_TICK, TOOLTIP_STYLE } from "./chartTheme";
 import { typeColorVar } from "../../lib/modelType";
 import type { ShapValues } from "../../types/visualizationData";
@@ -10,6 +11,10 @@ interface ShapValuesChartProps {
    * types/visualizationData.ts), just the raw per-sample arrays. */
   featureNames: string[];
   classLabels: string[];
+  // Set together only for the PDF report's off-screen capture -- see ChartFrame.
+  width?: number;
+  height?: number;
+  isAnimationActive?: boolean;
 }
 
 /** Screen 5's model-specific visual for group_02 (Random Forest, XGBoost)
@@ -19,12 +24,19 @@ interface ShapValuesChartProps {
  * feature) which already renders above this via FeatureImportanceChart;
  * this one is model-explanation-based and, for a multiclass model, shows
  * one bar per class per feature rather than collapsing classes away.
- * Classifier blue (--signal) throughout, per frontend.md's colour coding
- * -- group_02 ships only classifiers -- with per-class bars distinguished
+ * Classifier accent (--color-type-classifier) throughout, per frontend.md's
+ * colour coding -- group_02 ships only classifiers -- with per-class bars distinguished
  * by opacity rather than a new hue, since frontend.md reserves colour
  * assignment for model type, not for series within one model's own chart.
  */
-export function ShapValuesChart({ shapValues, featureNames, classLabels }: ShapValuesChartProps) {
+export function ShapValuesChart({
+  shapValues,
+  featureNames,
+  classLabels,
+  width,
+  height,
+  isAnimationActive,
+}: ShapValuesChartProps) {
   const is3D = Array.isArray(shapValues[0]?.[0]);
   const nFeatures = is3D ? (shapValues as number[][][])[0].length : (shapValues as number[][])[0].length;
   const nClasses = is3D ? (shapValues as number[][][])[0][0].length : 1;
@@ -64,27 +76,26 @@ export function ShapValuesChart({ shapValues, featureNames, classLabels }: ShapV
 
   return (
     <div>
-      <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
-            <CartesianGrid stroke="var(--color-rule)" horizontal={false} />
-            <XAxis type="number" tick={AXIS_TICK} />
-            <YAxis type="category" dataKey="feature" tick={AXIS_TICK} width={90} />
-            <Tooltip {...TOOLTIP_STYLE} cursor={{ fill: "var(--color-rule)", opacity: 0.3 }} />
-            {nClasses > 1 && <Legend wrapperStyle={{ fontSize: 10, fontFamily: "var(--font-mono)" }} />}
-            {Array.from({ length: nClasses }, (_, c) => (
-              <Bar
-                key={c}
-                dataKey={`class_${c}`}
-                name={classLabels[c] ?? `class ${c}`}
-                fill={color}
-                fillOpacity={nClasses > 1 ? 0.35 + 0.65 * (c / Math.max(nClasses - 1, 1)) : 1}
-                radius={0}
-              />
-            ))}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      <ChartFrame className="h-56" width={width} height={height}>
+        <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
+          <CartesianGrid stroke="var(--color-rule)" horizontal={false} />
+          <XAxis type="number" tick={AXIS_TICK} />
+          <YAxis type="category" dataKey="feature" tick={AXIS_TICK} width={90} />
+          <Tooltip {...TOOLTIP_STYLE} cursor={{ fill: "var(--color-rule)", opacity: 0.3 }} />
+          {nClasses > 1 && <Legend wrapperStyle={{ fontSize: 10, fontFamily: "var(--font-mono)" }} />}
+          {Array.from({ length: nClasses }, (_, c) => (
+            <Bar
+              key={c}
+              dataKey={`class_${c}`}
+              name={classLabels[c] ?? `class ${c}`}
+              fill={color}
+              fillOpacity={nClasses > 1 ? 0.35 + 0.65 * (c / Math.max(nClasses - 1, 1)) : 1}
+              radius={0}
+              isAnimationActive={isAnimationActive}
+            />
+          ))}
+        </BarChart>
+      </ChartFrame>
       <p className="mt-1 font-mono text-xs text-muted">
         Mean |SHAP value| across {nSamples} test samples
         {nClasses > 1 ? `, ${nClasses} classes` : ""}. Top feature: {topFeature?.feature as string}.

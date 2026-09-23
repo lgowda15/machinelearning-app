@@ -43,7 +43,7 @@ export function SplitSlider({
         value={testPct}
         disabled={disabled}
         onChange={(e) => onChange(Number(e.target.value) / 100)}
-        className="mt-4 w-full cursor-pointer accent-signal disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-4 w-full cursor-pointer accent-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
         aria-label="Test set percentage"
       />
 

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CompareScreen } from "./CompareScreen";
+import { useComparison } from "../../hooks/useComparison";
 import type { components } from "../../types/api";
 
 type TrainResponse = components["schemas"]["TrainResponse"];
@@ -11,6 +12,14 @@ const { GET, POST } = vi.hoisted(() => ({ GET: vi.fn(), POST: vi.fn() }));
 vi.mock("../../api/client", () => ({
   apiClient: { GET, POST },
 }));
+
+// App now instantiates useComparison() and passes it down (comparisonState
+// is lifted so a report can be built regardless of which screen is
+// mounted) -- mirror that wiring here instead of the screen owning the hook.
+function Harness({ trainingResults }: { trainingResults: TrainResponse | null }) {
+  const comparisonState = useComparison();
+  return <CompareScreen trainingResults={trainingResults} comparisonState={comparisonState} />;
+}
 
 const trainingResults: TrainResponse = {
   training_id: "t1",
@@ -58,13 +67,13 @@ const trainingResults: TrainResponse = {
 
 describe("CompareScreen", () => {
   it("shows a notice with no trained results", () => {
-    render(<CompareScreen trainingResults={null} />);
+    render(<Harness trainingResults={null} />);
     expect(screen.getByText("Train at least one model before comparing results.")).toBeInTheDocument();
   });
 
   it("explains a mixed-type selection instead of sending a request", async () => {
     const user = userEvent.setup();
-    render(<CompareScreen trainingResults={trainingResults} />);
+    render(<Harness trainingResults={trainingResults} />);
 
     await user.click(screen.getByText("Logistic Regression"));
     await user.click(screen.getByText("K-Means"));
@@ -101,7 +110,7 @@ describe("CompareScreen", () => {
       error: undefined,
     });
 
-    render(<CompareScreen trainingResults={trainingResults} />);
+    render(<Harness trainingResults={trainingResults} />);
 
     await user.click(screen.getByText("Logistic Regression"));
     await user.click(screen.getByText("Other Classifier"));

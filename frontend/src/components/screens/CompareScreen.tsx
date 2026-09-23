@@ -9,24 +9,23 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ScreenPanel, WORKSPACE_WIDTH } from "../ScreenPanel";
-import { AXIS_TICK, TOOLTIP_STYLE } from "../charts/chartTheme";
+import { ScreenHeader } from "../ScreenHeader";
+import { ScreenPanel } from "../ScreenPanel";
+import { AXIS_TICK, TOOLTIP_STYLE, dataColorForIndex } from "../charts/chartTheme";
 import { formatMetricValue } from "../../lib/format";
 import {
   typeBorderClass,
-  typeColorVar,
   typeTextClass,
 } from "../../lib/modelType";
-import { useComparison } from "../../hooks/useComparison";
+import type { useComparison } from "../../hooks/useComparison";
 import type { components } from "../../types/api";
 
 type TrainResponse = components["schemas"]["TrainResponse"];
 
 interface CompareScreenProps {
   trainingResults: TrainResponse | null;
+  comparisonState: ReturnType<typeof useComparison>;
 }
-
-const OPACITY_STEPS = [1, 0.7, 0.45, 0.25];
 
 /**
  * Screen 7:
@@ -37,8 +36,9 @@ const OPACITY_STEPS = [1, 0.7, 0.45, 0.25];
  */
 export function CompareScreen({
   trainingResults,
+  comparisonState,
 }: CompareScreenProps) {
-  const { result, loading, error, compare, reset } = useComparison();
+  const { result, loading, error, compare, reset } = comparisonState;
   const [selected, setSelected] = useState<string[]>([]);
 
   if (!trainingResults || trainingResults.results.length === 0) {
@@ -100,22 +100,11 @@ export function CompareScreen({
     selected.length >= 2 && !mixedTypes && !loading;
 
   return (
-    <ScreenPanel maxWidthClassName={WORKSPACE_WIDTH}>
-      {/* Header */}
-      <div className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-wider text-muted">
-          Model analysis
-        </p>
-
-        <h1 className="mt-1 text-xl font-semibold text-ink">
-          Compare
-        </h1>
-
-        <p className="mt-1 text-sm text-muted">
-          Select two or more trained models of the same type to compare
-          their performance.
-        </p>
-      </div>
+    <ScreenPanel>
+      <ScreenHeader
+        title="Compare"
+        description="Select two or more trained models of the same type to compare their performance."
+      />
 
       {/* Model selection */}
       <section className="mb-6 rounded-panel border border-rule bg-ground p-5">
@@ -240,7 +229,7 @@ export function CompareScreen({
               duration-150
               ${
                 canCompare
-                  ? "cursor-pointer border-signal bg-signal text-surface hover:opacity-90 active:scale-[0.98]"
+                  ? "cursor-pointer border-orange-700 bg-orange-700 text-white hover:opacity-90 active:scale-[0.98]"
                   : "cursor-not-allowed border-rule bg-surface text-muted opacity-60"
               }
             `}
@@ -507,10 +496,7 @@ function ComparisonResult({
                     key={m.model_key}
                     dataKey={m.model_key}
                     name={m.model_name}
-                    fill={typeColorVar(m.model_type)}
-                    fillOpacity={
-                      OPACITY_STEPS[index] ?? 0.25
-                    }
+                    fill={dataColorForIndex(index)}
                     radius={2}
                   />
                 ))}

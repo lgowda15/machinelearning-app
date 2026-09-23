@@ -12,7 +12,7 @@ export default defineConfig({
       // same-origin, without the backend needing CORS config. Production
       // gets the backend URL baked in at build time (ARCHITECTURE.md §11).
       "/api": {
-        target: "http://localhost:6060",
+        target: "http://localhost:8050",
         changeOrigin: true,
       },
     },
@@ -21,5 +21,15 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
+    // svg2pdf.js's package.json has no "exports" map, so Vitest's default
+    // Node-style resolution for externalized deps picks its CJS/UMD "main"
+    // (which expects a global `jspdf`) instead of its ESM "module" build.
+    // Forcing it through Vite's own resolver (which respects "module")
+    // fixes it -- see renderReportPdf.ts, the only place that imports it.
+    server: {
+      deps: {
+        inline: ["svg2pdf.js"],
+      },
+    },
   },
 });

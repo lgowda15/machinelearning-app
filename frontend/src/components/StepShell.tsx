@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { DownloadReportButton } from "./DownloadReportButton";
 import { Logo } from "./Logo";
 import { StepIndicator } from "./StepIndicator";
+import type { CycleState } from "../lib/report/types";
 import type { StepId, View } from "../types/steps";
 
 interface StepShellProps {
@@ -13,15 +15,15 @@ interface StepShellProps {
   onForward: () => void;
   renderStart: () => ReactNode;
   renderStep: (step: StepId) => ReactNode;
+  cycle: CycleState;
 }
 
 /**
- * Persistent application shell:
- * - Sticky header
- * - Scrollable page content
- * - Fixed bottom navigation
- * - Back and Continue remain accessible while scrolling
- * - Continue is highlighted only when forward navigation is available
+ * Persistent application shell -- a fixed three-row grid (header / main /
+ * footer) filling the viewport. Only `main` can ever scroll, and it doesn't
+ * on its own (`overflow-hidden`): each screen owns at most one internal
+ * scroll region itself (CLAUDE.md's layout rule), so the page as a whole
+ * never scrolls.
  */
 export function StepShell({
   view,
@@ -33,13 +35,14 @@ export function StepShell({
   onForward,
   renderStart,
   renderStep,
+  cycle,
 }: StepShellProps) {
   const isStart = view === "start";
 
   return (
-    <div className="flex min-h-screen flex-col bg-ground">
+    <div className="grid h-dvh grid-rows-[auto_1fr_auto] bg-ground">
       {/* Header */}
-      <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center border-b border-black/20 bg-brand-navy px-6">
+      <header className="relative flex h-14 shrink-0 items-center border-b border-black/20 bg-navy-900 px-6">
   {/* Centered step navigation */}
   <div className="absolute left-1/2 w-max max-w-[calc(100%-7rem)] -translate-x-1/2">
     <StepIndicator
@@ -49,33 +52,28 @@ export function StepShell({
     />
   </div>
 
-  {/* Logo stays on the right */}
-  <div className="ml-auto">
+  {/* Download report and logo stay on the right */}
+  <div className="ml-auto flex items-center gap-4">
+    {!isStart && <DownloadReportButton cycle={cycle} />}
     <Logo variant="mark" className="h-9 w-9" />
   </div>
 </header>
 
-      {/* Main content */}
-      <main className="flex-1 px-6 py-8 pb-28">
+      {/* Main content -- fills the row between header and footer exactly;
+          it does not scroll itself, each screen does (or doesn't). */}
+      <main className="min-h-0 overflow-hidden px-6 py-4">
         {isStart ? renderStart() : renderStep(view)}
       </main>
 
-      {/* Fixed bottom navigation */}
+      {/* Bottom navigation -- a real grid row now, not fixed/floating. */}
       {!isStart && (
         <nav
           className="
-            fixed
-            bottom-0
-            left-0
-            right-0
-            z-30
             border-t
             border-rule
-            bg-surface/95
+            bg-surface
             px-6
             py-3
-            shadow-sm
-            backdrop-blur
           "
         >
           <div className="flex items-center justify-between">
@@ -126,9 +124,9 @@ export function StepShell({
                   canGoForward
                     ? `
                       cursor-pointer
-                      border-signal
-                      bg-signal
-                      text-surface
+                      border-orange-700
+                      bg-orange-700
+                      text-white
                       hover:opacity-90
                       active:scale-[0.98]
                     `

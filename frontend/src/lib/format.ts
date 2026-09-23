@@ -6,3 +6,20 @@ export function formatMetricValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
   return JSON.stringify(value);
 }
+
+/** Formats one row of a prediction result (Screen 6 and the PDF report).
+ * A dimensionality reducer's predict returns a 2D row (CLAUDE.md's "known
+ * contract exception"), hence the array branch. */
+export function formatPredictionValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value
+      .map((v) => (typeof v === "number" ? v.toFixed(4) : String(v)))
+      .join(", ");
+  }
+
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? String(value) : value.toFixed(4);
+  }
+
+  return String(value);
+}

@@ -8,7 +8,8 @@ import { ShapValuesChart } from "../charts/ShapValuesChart";
 import { TreeStructureChart } from "../charts/TreeStructureChart";
 import { VariancePlotChart } from "../charts/VariancePlotChart";
 import { MetricsList } from "../MetricsList";
-import { ScreenPanel, WORKSPACE_WIDTH } from "../ScreenPanel";
+import { ScreenHeader } from "../ScreenHeader";
+import { ScreenPanel } from "../ScreenPanel";
 import { typeBorderClass, typeTextClass } from "../../lib/modelType";
 import type { components } from "../../types/api";
 import type {
@@ -60,21 +61,11 @@ export function ResultsScreen({ results }: ResultsScreenProps) {
   );
 
   return (
-    <ScreenPanel maxWidthClassName={WORKSPACE_WIDTH}>
-      {/* Page heading */}
-      <div className="mb-6">
-        <p className="font-mono text-xs uppercase tracking-wider text-muted">
-          Training complete
-        </p>
-
-        <h1 className="mt-1 text-xl font-semibold text-ink">
-          Results
-        </h1>
-
-        <p className="mt-1 text-sm text-muted">
-          Review the performance and visual output of each trained model.
-        </p>
-      </div>
+    <ScreenPanel>
+      <ScreenHeader
+        title="Results"
+        description="Review the performance and visual output of each trained model."
+      />
 
       {/* Overview cards */}
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
