@@ -18,6 +18,11 @@ interface DistributionChartProps {
   width?: number;
   height?: number;
   isAnimationActive?: boolean;
+  // On-screen chart height, a Tailwind height class -- EDA's main panel
+  // (screen 2) needs this smaller than the default so the panel never
+  // needs its own scroll region (CLAUDE.md's layout rule; the rail is
+  // this screen's one scroll region).
+  chartHeightClassName?: string;
 }
 
 /** One column's distribution -- screen 2's right column, target first
@@ -30,6 +35,7 @@ export function DistributionChart({
   width,
   height,
   isAnimationActive,
+  chartHeightClassName = "h-72",
 }: DistributionChartProps) {
   const buckets = bucketsForColumn(column);
   const caption = topBucketCaption(buckets);
@@ -53,7 +59,7 @@ export function DistributionChart({
         )}
       </div>
       {buckets.length > 0 ? (
-        <ChartFrame className="mt-2 h-40" width={width} height={height}>
+        <ChartFrame className={`mt-2 ${chartHeightClassName}`} width={width} height={height}>
           <BarChart data={buckets} margin={{ top: 4, right: 4, left: 4, bottom: 4 }}>
             <CartesianGrid stroke="var(--color-rule)" vertical={false} />
             <XAxis

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dropzone } from "../Dropzone";
+import { ScreenHeader } from "../ScreenHeader";
 import { ScreenPanel } from "../ScreenPanel";
 import {
   buildSingleRowCsv,
@@ -29,11 +30,11 @@ interface PredictScreenProps {
 }
 
 /**
- * Screen 6:
- * - Choose a trained model
- * - Choose between CSV upload and manual entry
- * - Enter feature values in a compact responsive grid
- * - Display prediction results clearly
+ * Screen 6 -- two columns, no scroll (CLAUDE.md's layout rule): model
+ * picker + input form on the left, prediction results in place on the
+ * right (not appended below the form). Manual mode's feature grid is this
+ * screen's one scroll region -- the only part of the form whose length
+ * depends on the dataset (wide datasets, many features).
  */
 export function PredictScreen({
   profile,
@@ -163,96 +164,61 @@ export function PredictScreen({
 
   return (
     <ScreenPanel>
-      <div className="flex flex-col gap-6">
-        {/* Header */}
-        <div>
-          <p className="font-mono text-xs uppercase tracking-wider text-muted">
-            New prediction
-          </p>
+      <ScreenHeader
+        title="Predict on new data"
+        description="Run a trained model on new data. Upload a CSV with the same feature columns as your training data, or enter one row manually."
+      />
 
-          <h1 className="mt-1 text-xl font-semibold text-ink">
-            Predict on new data
-          </h1>
-
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-            Run a trained model on new data. Upload a CSV with the
-            same feature columns as your training data, or enter one
-            row manually.
-          </p>
-        </div>
-
-        {/* Model selection */}
-        <section className="rounded-panel border border-rule bg-ground p-5">
-          <div className="mb-3">
-            <h2 className="text-sm font-semibold text-ink">
-              Model
-            </h2>
-
-            <p className="mt-1 text-xs text-muted">
-              Choose which trained model should generate the
-              prediction.
-            </p>
-          </div>
-
-          <select
-            id="predict-model"
-            className="
-              w-full
-              cursor-pointer
-              rounded-panel
-              border
-              border-rule
-              bg-surface
-              px-3
-              py-2.5
-              text-sm
-              text-ink
-              transition-colors
-              hover:border-ink/30
-              focus:border-signal
-            "
-            value={modelKey}
-            onChange={(e) => {
-              setModelKey(e.target.value);
-              reset();
-            }}
-          >
-            {trainingResults.results.map((model) => (
-              <option
-                key={model.model_key}
-                value={model.model_key}
-              >
-                {model.model_name} · {model.model_type}
-              </option>
-            ))}
-          </select>
-
-          {selectedModel && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="rounded-full bg-surface px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-muted">
-                {selectedModel.model_type}
-              </span>
-
-              <span className="rounded-full bg-surface px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-muted">
-                {selectedModel.n_features} features
-              </span>
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-6">
+        {/* Left: model picker + input form */}
+        <div className="flex min-h-0 flex-col gap-4">
+          {/* Model selection */}
+          <section className="shrink-0 rounded-panel border border-rule bg-ground p-4">
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <h2 className="text-sm font-semibold text-ink">Model</h2>
+              {selectedModel && (
+                <span className="font-mono text-[10px] uppercase tracking-wide text-muted">
+                  {selectedModel.model_type} · {selectedModel.n_features} features
+                </span>
+              )}
             </div>
-          )}
-        </section>
 
-        {/* Input mode */}
-        <section>
-          <div className="mb-3">
-            <h2 className="text-sm font-semibold text-ink">
-              Input data
-            </h2>
+            <select
+              id="predict-model"
+              className="
+                w-full
+                cursor-pointer
+                rounded-panel
+                border
+                border-rule
+                bg-surface
+                px-3
+                py-2
+                text-sm
+                text-ink
+                transition-colors
+                hover:border-ink/30
+                focus:border-signal
+              "
+              value={modelKey}
+              onChange={(e) => {
+                setModelKey(e.target.value);
+                reset();
+              }}
+            >
+              {trainingResults.results.map((model) => (
+                <option
+                  key={model.model_key}
+                  value={model.model_key}
+                >
+                  {model.model_name} · {model.model_type}
+                </option>
+              ))}
+            </select>
+          </section>
 
-            <p className="mt-1 text-xs text-muted">
-              Choose how you want to provide the new data.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 rounded-panel border border-rule bg-ground p-1.5">
+          {/* Input mode toggle */}
+          <div className="grid shrink-0 grid-cols-2 gap-2 rounded-panel border border-rule bg-ground p-1.5">
             <button
               type="button"
               aria-pressed={mode === "csv"}
@@ -261,7 +227,7 @@ export function PredictScreen({
                 cursor-pointer
                 rounded-panel
                 px-4
-                py-2.5
+                py-2
                 text-sm
                 font-medium
                 transition-all
@@ -284,7 +250,7 @@ export function PredictScreen({
                 cursor-pointer
                 rounded-panel
                 px-4
-                py-2.5
+                py-2
                 text-sm
                 font-medium
                 transition-all
@@ -299,269 +265,254 @@ export function PredictScreen({
               Enter values
             </button>
           </div>
-        </section>
 
-        {/* CSV mode */}
-        {mode === "csv" ? (
-          <section className="rounded-panel border border-rule bg-surface p-5">
-            <div className="mb-4">
-              <h2 className="text-sm font-semibold text-ink">
-                Upload prediction data
-              </h2>
+          {/* CSV mode */}
+          {mode === "csv" ? (
+            <div className="flex min-h-0 flex-1 flex-col gap-3">
+              <Dropzone
+                onFile={handleFile}
+                loading={loading}
+                fileName={file?.name}
+              />
 
-              <p className="mt-1 text-xs leading-relaxed text-muted">
-                Your CSV should contain the same feature columns
-                used to train the selected model.
-              </p>
-            </div>
-
-            <Dropzone
-              onFile={handleFile}
-              loading={loading}
-              fileName={file?.name}
-            />
-
-            {/* Column mismatch */}
-            {mismatch && (
-              <div className="mt-4 rounded-panel border border-rule bg-ground px-4 py-3">
-                <p className="text-sm font-medium text-ink">
-                  Column mismatch
-                </p>
-
-                <p className="mt-1 text-xs leading-relaxed text-muted">
-                  This file's columns don't match the training
-                  data.
-                </p>
-
-                {mismatch.missing.length > 0 && (
-                  <p className="mt-2 text-xs text-muted">
-                    Missing:{" "}
-                    <span className="font-mono text-ink">
-                      {mismatch.missing.join(", ")}
-                    </span>
+              {/* Column mismatch */}
+              {mismatch && (
+                <div className="shrink-0 rounded-panel border border-rule bg-ground px-4 py-3">
+                  <p className="text-sm font-medium text-ink">
+                    Column mismatch
                   </p>
-                )}
 
-                {mismatch.unexpected.length > 0 && (
-                  <p className="mt-1 text-xs text-muted">
-                    Unexpected:{" "}
-                    <span className="font-mono text-ink">
-                      {mismatch.unexpected.join(", ")}
-                    </span>
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    This file's columns don't match the training
+                    data.
                   </p>
-                )}
-              </div>
-            )}
 
-            <div className="mt-5 flex justify-end">
-              <button
-                type="button"
-                onClick={handlePredictCsv}
-                disabled={!canPredictCsv}
-                className={`
-                  rounded-panel
-                  border
-                  px-5
-                  py-2.5
-                  text-sm
-                  font-medium
-                  transition-all
-                  duration-150
-                  ${
-                    canPredictCsv
-                      ? "cursor-pointer border-signal bg-signal text-surface hover:opacity-90 active:scale-[0.98]"
-                      : "cursor-not-allowed border-rule bg-ground text-muted opacity-60"
-                  }
-                `}
-              >
-                {loading ? "Predicting…" : "Predict"}
-              </button>
-            </div>
-          </section>
-        ) : (
-          /* Manual mode */
-          <section className="rounded-panel border border-rule bg-surface p-5">
-            <div className="mb-5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold text-ink">
-                    Enter feature values
-                  </h2>
+                  {mismatch.missing.length > 0 && (
+                    <p className="mt-2 text-xs text-muted">
+                      Missing:{" "}
+                      <span className="font-mono text-ink">
+                        {mismatch.missing.join(", ")}
+                      </span>
+                    </p>
+                  )}
 
-                  <p className="mt-1 text-xs text-muted">
-                    Provide one value for every feature.
-                  </p>
+                  {mismatch.unexpected.length > 0 && (
+                    <p className="mt-1 text-xs text-muted">
+                      Unexpected:{" "}
+                      <span className="font-mono text-ink">
+                        {mismatch.unexpected.join(", ")}
+                      </span>
+                    </p>
+                  )}
                 </div>
+              )}
 
+              <div className="mt-auto flex shrink-0 justify-end">
+                <button
+                  type="button"
+                  onClick={handlePredictCsv}
+                  disabled={!canPredictCsv}
+                  className={`
+                    rounded-panel
+                    border
+                    px-5
+                    py-2.5
+                    text-sm
+                    font-medium
+                    transition-all
+                    duration-150
+                    ${
+                      canPredictCsv
+                        ? "cursor-pointer border-orange-700 bg-orange-700 text-white hover:opacity-90 active:scale-[0.98]"
+                        : "cursor-not-allowed border-rule bg-ground text-muted opacity-60"
+                    }
+                  `}
+                >
+                  {loading ? "Predicting…" : "Predict"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Manual mode */
+            <div className="flex min-h-0 flex-1 flex-col gap-3">
+              <div className="flex shrink-0 items-center justify-between gap-3">
+                <p className="text-xs text-muted">Provide one value for every feature.</p>
                 <span className="shrink-0 rounded-full bg-ground px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide text-muted">
                   {featureColumns.length} features
                 </span>
               </div>
-            </div>
 
-            {/* Feature grid */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              {featureColumns.map((column, index) => {
-                const isMissing = manualMissing.includes(
-                  column.name,
-                );
+              {/* Feature grid -- this screen's one scroll region */}
+              <div className="grid min-h-0 flex-1 auto-rows-min gap-3 overflow-y-auto rounded-panel border border-rule bg-surface p-3 sm:grid-cols-2">
+                {featureColumns.map((column, index) => {
+                  const isMissing = manualMissing.includes(
+                    column.name,
+                  );
 
-                return (
-                  <div
-                    key={column.name}
-                    className={`
-                      rounded-panel
-                      border
-                      bg-ground
-                      p-3.5
-                      transition-colors
-                      ${
-                        isMissing
-                          ? "border-signal"
-                          : "border-rule"
-                      }
-                    `}
-                  >
-                    <div className="mb-2 flex items-start justify-between gap-2">
-                      <label
-                        htmlFor={`manual-${column.name}`}
-                        className="min-w-0 text-xs font-medium text-ink"
-                      >
-                        <span className="mr-1 font-mono text-[10px] text-muted">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-
-                        {column.name}
-                      </label>
-
-                      <span className="shrink-0 font-mono text-[10px] lowercase text-muted">
-                        {column.dtype}
-                      </span>
-                    </div>
-
-                    <input
-                      id={`manual-${column.name}`}
-                      type={
-                        column.dtype === "numeric"
-                          ? "number"
-                          : "text"
-                      }
-                      step={
-                        column.dtype === "numeric"
-                          ? "any"
-                          : undefined
-                      }
-                      value={
-                        manualValues[column.name] ?? ""
-                      }
-                      disabled={loading}
-                      placeholder={
-                        column.dtype === "numeric"
-                          ? "Enter number"
-                          : "Enter value"
-                      }
-                      onChange={(e) =>
-                        handleManualFieldChange(
-                          column.name,
-                          e.target.value,
-                        )
-                      }
+                  return (
+                    <div
+                      key={column.name}
                       className={`
-                        w-full
                         rounded-panel
                         border
-                        bg-surface
-                        px-3
-                        py-2.5
-                        font-mono
-                        text-sm
-                        text-ink
-                        placeholder:text-muted/50
+                        bg-ground
+                        p-3
                         transition-colors
-                        focus:outline-none
                         ${
                           isMissing
                             ? "border-signal"
-                            : "border-rule focus:border-signal"
+                            : "border-rule"
                         }
                       `}
-                    />
-                  </div>
-                );
-              })}
-            </div>
+                    >
+                      <div className="mb-2 flex items-start justify-between gap-2">
+                        <label
+                          htmlFor={`manual-${column.name}`}
+                          className="min-w-0 text-xs font-medium text-ink"
+                        >
+                          <span className="mr-1 font-mono text-[10px] text-muted">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
 
-            {/* Missing fields */}
-            {manualMissing.length > 0 && (
-              <div className="mt-5 rounded-panel border border-rule bg-ground px-4 py-3">
-                <p className="text-sm font-medium text-ink">
-                  Complete the required fields
-                </p>
+                          {column.name}
+                        </label>
 
-                <p className="mt-1 text-xs leading-relaxed text-muted">
-                  Enter a value for every feature before
-                  predicting.
-                </p>
+                        <span className="shrink-0 font-mono text-[10px] lowercase text-muted">
+                          {column.dtype}
+                        </span>
+                      </div>
 
-                <p className="mt-2 text-xs text-muted">
-                  Missing:{" "}
-                  <span className="font-mono text-ink">
-                    {manualMissing.join(", ")}
-                  </span>
-                </p>
+                      <input
+                        id={`manual-${column.name}`}
+                        type={
+                          column.dtype === "numeric"
+                            ? "number"
+                            : "text"
+                        }
+                        step={
+                          column.dtype === "numeric"
+                            ? "any"
+                            : undefined
+                        }
+                        value={
+                          manualValues[column.name] ?? ""
+                        }
+                        disabled={loading}
+                        placeholder={
+                          column.dtype === "numeric"
+                            ? "Enter number"
+                            : "Enter value"
+                        }
+                        onChange={(e) =>
+                          handleManualFieldChange(
+                            column.name,
+                            e.target.value,
+                          )
+                        }
+                        className={`
+                          w-full
+                          rounded-panel
+                          border
+                          bg-surface
+                          px-3
+                          py-2
+                          font-mono
+                          text-sm
+                          text-ink
+                          placeholder:text-muted/50
+                          transition-colors
+                          focus:outline-none
+                          ${
+                            isMissing
+                              ? "border-signal"
+                              : "border-rule focus:border-signal"
+                          }
+                        `}
+                      />
+                    </div>
+                  );
+                })}
               </div>
-            )}
 
-            <div className="mt-5 flex justify-end">
-              <button
-                type="button"
-                onClick={handlePredictManual}
-                disabled={loading}
-                className={`
-                  rounded-panel
-                  border
-                  px-5
-                  py-2.5
-                  text-sm
-                  font-medium
-                  transition-all
-                  duration-150
-                  ${
-                    !loading
-                      ? "cursor-pointer border-signal bg-signal text-surface hover:opacity-90 active:scale-[0.98]"
-                      : "cursor-not-allowed border-rule bg-ground text-muted opacity-60"
-                  }
-                `}
-              >
-                {loading ? "Predicting…" : "Predict"}
-              </button>
+              {/* Missing fields */}
+              {manualMissing.length > 0 && (
+                <div className="shrink-0 rounded-panel border border-rule bg-ground px-4 py-3">
+                  <p className="text-sm font-medium text-ink">
+                    Complete the required fields
+                  </p>
+
+                  <p className="mt-1 text-xs leading-relaxed text-muted">
+                    Enter a value for every feature before
+                    predicting.
+                  </p>
+
+                  <p className="mt-2 text-xs text-muted">
+                    Missing:{" "}
+                    <span className="font-mono text-ink">
+                      {manualMissing.join(", ")}
+                    </span>
+                  </p>
+                </div>
+              )}
+
+              <div className="flex shrink-0 justify-end">
+                <button
+                  type="button"
+                  onClick={handlePredictManual}
+                  disabled={loading}
+                  className={`
+                    rounded-panel
+                    border
+                    px-5
+                    py-2.5
+                    text-sm
+                    font-medium
+                    transition-all
+                    duration-150
+                    ${
+                      !loading
+                        ? "cursor-pointer border-orange-700 bg-orange-700 text-white hover:opacity-90 active:scale-[0.98]"
+                        : "cursor-not-allowed border-rule bg-ground text-muted opacity-60"
+                    }
+                  `}
+                >
+                  {loading ? "Predicting…" : "Predict"}
+                </button>
+              </div>
             </div>
-          </section>
-        )}
+          )}
 
-        {/* Error */}
-        {error && (
-          <div className="rounded-panel border border-rule bg-ground px-4 py-3">
-            <p className="text-sm font-medium text-ink">
-              Prediction failed
-            </p>
+          {/* Error */}
+          {error && (
+            <div className="shrink-0 rounded-panel border border-rule bg-ground px-4 py-3">
+              <p className="text-sm font-medium text-ink">
+                Prediction failed
+              </p>
 
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              {error.message}
-            </p>
-          </div>
-        )}
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                {error.message}
+              </p>
+            </div>
+          )}
+        </div>
 
-        {/* Results */}
-        {result && <PredictionTable result={result} />}
+        {/* Right: results, in place */}
+        <div className="flex min-h-0 flex-col">
+          {result ? (
+            <PredictionTable result={result} />
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center rounded-panel border border-rule bg-ground px-4 py-12 text-center">
+              <p className="text-sm font-medium text-ink">No prediction yet</p>
+              <p className="mt-2 max-w-xs text-xs text-muted">
+                Results appear here once you run a prediction.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </ScreenPanel>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Prediction formatting                                                     */
-/* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */
 /* Prediction results                                                         */
@@ -578,9 +529,9 @@ function PredictionTable({
   );
 
   return (
-    <section className="rounded-panel border border-rule bg-surface p-5">
+    <section className="flex min-h-0 flex-1 flex-col rounded-panel border border-rule bg-surface p-5">
       {/* Result header */}
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+      <div className="mb-4 flex shrink-0 flex-wrap items-end justify-between gap-3">
         <div>
           <p className="font-mono text-xs uppercase tracking-wider text-muted">
             Prediction complete
@@ -600,8 +551,8 @@ function PredictionTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-panel border border-rule">
-        <table className="w-full min-w-[520px] text-left text-sm">
+      <div className="min-h-0 flex-1 overflow-y-auto rounded-panel border border-rule">
+        <table className="w-full min-w-[420px] text-left text-sm">
           <thead>
             <tr className="border-b border-rule bg-ground">
               <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted">
@@ -648,7 +599,7 @@ function PredictionTable({
       </div>
 
       {result.n_samples > MAX_ROWS_SHOWN && (
-        <p className="mt-2 font-mono text-xs text-muted">
+        <p className="mt-2 shrink-0 font-mono text-xs text-muted">
           Showing first {MAX_ROWS_SHOWN} of{" "}
           {result.n_samples}.
         </p>

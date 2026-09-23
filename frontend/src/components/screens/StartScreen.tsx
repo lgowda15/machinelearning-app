@@ -8,11 +8,11 @@ export function StartScreen({ onBegin }: StartScreenProps) {
   return (
     <section className="grid h-screen w-full grid-cols-1 overflow-hidden lg:grid-cols-2">
       {/* LEFT — Branding */}
-      <div className="relative flex flex-col justify-between overflow-hidden bg-brand-navy px-10 py-10 text-white sm:px-14 lg:px-16">
+      <div className="relative flex flex-col justify-between overflow-hidden bg-navy-900 px-10 py-10 text-white sm:px-14 lg:px-16">
         {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full border border-white/10" />
         <div className="pointer-events-none absolute -bottom-40 -left-32 h-96 w-96 rounded-full border border-white/10" />
-        <div className="pointer-events-none absolute right-20 top-32 h-24 w-24 rounded-full bg-brand-gold/10" />
+        <div className="pointer-events-none absolute right-20 top-32 h-24 w-24 rounded-full bg-orange-500/10" />
 
         <div className="relative z-10">
           {/* PES branding */}
@@ -32,14 +32,14 @@ export function StartScreen({ onBegin }: StartScreenProps) {
 
           {/* Main heading */}
           <div className="mt-[18vh] max-w-[650px]">
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-brand-gold">
+            <p className="font-mono text-xs uppercase tracking-[0.22em] text-orange-500">
               ML Integration Platform
             </p>
 
             <h1 className="mt-5 text-5xl font-semibold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
               Turn your data
               <br />
-              into <span className="text-brand-gold">insights.</span>
+              into <span className="text-orange-500">insights.</span>
             </h1>
 
             <p className="mt-8 max-w-[560px] text-base leading-7 text-white/65 sm:text-lg">
@@ -52,7 +52,7 @@ export function StartScreen({ onBegin }: StartScreenProps) {
 
         {/* Bottom label */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="h-px w-12 bg-brand-gold" />
+          <div className="h-px w-12 bg-orange-500" />
 
           <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
             Explore · Train · Compare
@@ -122,7 +122,7 @@ export function StartScreen({ onBegin }: StartScreenProps) {
           <button
             type="button"
             onClick={onBegin}
-            className="mt-8 flex w-full items-center justify-center gap-3 rounded-panel bg-signal px-6 py-4 text-sm font-medium text-white transition-all duration-150 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0"
+            className="mt-8 flex w-full items-center justify-center gap-3 rounded-panel bg-orange-700 px-6 py-4 text-sm font-medium text-white transition-all duration-150 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-md active:translate-y-0"
           >
             <span>Begin</span>
             <span aria-hidden="true">→</span>

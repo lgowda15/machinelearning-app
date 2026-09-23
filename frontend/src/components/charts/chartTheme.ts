@@ -33,3 +33,24 @@ export function markerShapeForCluster(clusterId: number): (typeof CLUSTER_MARKER
   const index = clusterId % CLUSTER_MARKER_SHAPES.length;
   return CLUSTER_MARKER_SHAPES[index];
 }
+
+/** --color-data-1 .. -10 (index.css's @theme block), the ordered categorical
+ * scale for multi-model comparison charts (e.g. Compare's bar chart, where
+ * every series is the same model type, so the type-colour scale can't tell
+ * them apart). Assign by selection order, never cycle/reorder by value. */
+export const DATA_COLORS = [
+  "var(--color-data-1)",
+  "var(--color-data-2)",
+  "var(--color-data-3)",
+  "var(--color-data-4)",
+  "var(--color-data-5)",
+  "var(--color-data-6)",
+  "var(--color-data-7)",
+  "var(--color-data-8)",
+  "var(--color-data-9)",
+  "var(--color-data-10)",
+] as const;
+
+export function dataColorForIndex(index: number): string {
+  return DATA_COLORS[index % DATA_COLORS.length];
+}

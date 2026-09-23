@@ -15,9 +15,10 @@ interface TreeStructureChartProps {
  * labelled with the branch condition that leads to them. That works
  * unchanged across all four algorithms' split types (binary, oblique,
  * multiway) since `children` and `edges[].label` are already
- * ready-to-display regardless of split type. Classifier blue (--signal),
- * per frontend.md's model-type colour coding -- trees are always
- * classifiers here (group_01 ships none of the other three model types).
+ * ready-to-display regardless of split type. Classifier accent
+ * (--color-type-classifier), per frontend.md's model-type colour coding --
+ * trees are always classifiers here (group_01 ships none of the other
+ * three model types).
  */
 export function TreeStructureChart({ data }: TreeStructureChartProps) {
   const nodesById = new Map(data.nodes.map((node) => [node.id, node]));
@@ -80,11 +81,11 @@ function NodeCard({ node }: { node: TreeNode }) {
     <div
       className={
         "w-44 shrink-0 rounded-panel border p-2 text-xs " +
-        (node.is_leaf ? "border-signal bg-surface" : "border-rule bg-surface-alt")
+        (node.is_leaf ? "border-type-classifier bg-surface" : "border-rule bg-surface-alt")
       }
     >
       {node.is_leaf ? (
-        <p className="font-medium text-signal">class {String(node.predicted_class)}</p>
+        <p className="font-medium text-type-classifier">class {String(node.predicted_class)}</p>
       ) : (
         <p className="break-words font-mono text-ink">{node.split?.condition}</p>
       )}

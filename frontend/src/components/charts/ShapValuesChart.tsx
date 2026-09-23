@@ -24,8 +24,8 @@ interface ShapValuesChartProps {
  * feature) which already renders above this via FeatureImportanceChart;
  * this one is model-explanation-based and, for a multiclass model, shows
  * one bar per class per feature rather than collapsing classes away.
- * Classifier blue (--signal) throughout, per frontend.md's colour coding
- * -- group_02 ships only classifiers -- with per-class bars distinguished
+ * Classifier accent (--color-type-classifier) throughout, per frontend.md's
+ * colour coding -- group_02 ships only classifiers -- with per-class bars distinguished
  * by opacity rather than a new hue, since frontend.md reserves colour
  * assignment for model type, not for series within one model's own chart.
  */

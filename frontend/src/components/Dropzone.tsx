@@ -4,6 +4,9 @@ interface DropzoneProps {
   onFile: (file: File) => void;
   loading: boolean;
   fileName?: string;
+  // Stretch to the height of its flex parent instead of the default
+  // min-h-44 -- Upload screen 1's left column, a full-height drop target.
+  fill?: boolean;
 }
 
 /**
@@ -19,6 +22,7 @@ export function Dropzone({
   onFile,
   loading,
   fileName,
+  fill = false,
 }: DropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputId = "csv-upload";
@@ -53,7 +57,7 @@ export function Dropzone({
       className={`
         relative
         flex
-        min-h-44
+        ${fill ? "h-full" : "min-h-44"}
         flex-col
         items-center
         justify-center
